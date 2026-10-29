@@ -1,0 +1,114 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Called It · C2 Slip</title>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#f2efe8;--card:#fff;--ink:#141414;--mute:#8d8a82;--pol:#5b5bf0;--fb:#12a36b;--cr:#f59e0b;--red:#ef4444;--lime:#c6f432;--line:#e7e3d9;
+--q:#e7e6ff;--c:#ffe3df;--f:#dcf6ea;--s:#ecebe8;--n:#fff0d6}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.4 "Bricolage Grotesque",system-ui,sans-serif}
+.mono{font-family:"JetBrains Mono",monospace}
+.k{font:11px "JetBrains Mono";letter-spacing:1px;text-transform:uppercase;color:var(--mute)}
+header{display:flex;align-items:center;gap:18px;padding:16px 32px}
+.logo{display:flex;align-items:center;gap:8px;font:800 25px "Bricolage Grotesque";letter-spacing:-1px}
+.logo i{width:28px;height:28px;border-radius:9px;background:var(--lime);display:grid;place-items:center;font-style:normal;font-size:17px;border:2px solid var(--ink);box-shadow:0 3px 0 var(--ink)}
+nav{display:flex;gap:6px}nav span{padding:8px 13px;word-spacing:4px;border-radius:99px;background:#fff;font-weight:600;font-size:14px;border:1.5px solid var(--line)}nav span.on{background:var(--ink);color:#fff;border-color:var(--ink)}
+.bal{margin-left:auto;font:700 13px "JetBrains Mono";background:#fff;border:1.5px solid var(--line);padding:9px 14px;border-radius:12px}
+.lip{background:var(--ink);color:#fff;font-weight:800;padding:11px 18px;border-radius:13px;box-shadow:0 4px 0 #000}
+main{display:grid;grid-template-columns:1.45fr 1fr;gap:26px;padding:6px 32px 32px}
+/* deck */
+.deck{position:relative;padding-top:14px}
+.ghost{position:absolute;left:18px;right:18px;top:0;height:120px;border-radius:24px;background:#fff;opacity:.55;transform:rotate(-1.6deg)}
+.ghost.g2{left:34px;right:34px;top:-8px;opacity:.3;transform:rotate(1.4deg)}
+.slip{position:relative;background:var(--card);border-radius:24px;overflow:hidden;box-shadow:0 2px 0 #e0dccf,0 30px 50px -34px #0006}
+.band{background:var(--pol);color:#fff;padding:13px 24px;display:flex;justify-content:space-between;align-items:center;font:700 12px "JetBrains Mono";letter-spacing:1px}
+.holes{position:absolute;left:0;right:0;top:43px;display:flex;justify-content:space-between;padding:0 12px}.holes i{width:13px;height:13px;border-radius:50%;background:var(--bg);margin-top:-6px}
+.body{padding:22px 24px 20px}
+.qrow{display:flex;gap:18px;align-items:flex-start}
+h1{font:800 33px/1.04 "Bricolage Grotesque";letter-spacing:-1.3px;margin:0 0 18px;flex:1}
+.clock{display:flex;gap:5px}.clock div{background:var(--ink);color:#fff;border-radius:10px;padding:6px 8px;text-align:center;font:700 18px "JetBrains Mono"}.clock small{display:block;font-size:9px;opacity:.6;font-weight:400}
+.meter{display:flex;height:56px;border-radius:15px;font:800 21px "Bricolage Grotesque";color:#fff;position:relative}
+.meter .seg{display:flex;align-items:center;padding:0 18px}.meter .seg:first-child{border-radius:15px 0 0 15px}.meter .seg:nth-child(2){border-radius:0 15px 15px 0}
+.tick{position:absolute;top:-6px;bottom:-6px;width:3px;background:var(--ink);border-radius:2px}
+.tick span{position:absolute;top:-17px;left:-30px;width:64px;text-align:center;font:700 10px "JetBrains Mono";color:var(--ink)}
+.refs{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin:16px 0}
+.ref{background:var(--bg);border-radius:14px;padding:11px 14px}.ref b{font:800 25px "Bricolage Grotesque";display:block}
+.stake{display:flex;gap:8px;align-items:center;margin-bottom:14px}
+.stake span{padding:8px 13px;border-radius:11px;border:1.5px solid var(--line);font:700 13px "JetBrains Mono"}.stake span.on{border-color:var(--ink);background:var(--lime)}
+.conf{flex:1;height:8px;border-radius:9px;background:linear-gradient(90deg,var(--pol) 70%,#e3e2ee 70%);position:relative;margin-left:10px}.conf:after{content:"70% sure";position:absolute;left:70%;top:-26px;transform:translateX(-50%);font:700 11px "JetBrains Mono"}
+.cta{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.cta div{padding:17px;border-radius:17px;text-align:center;font:800 19px "Bricolage Grotesque";box-shadow:0 5px 0 #0004;display:flex;justify-content:center;gap:10px;align-items:center}
+.cta small{font:700 11px "JetBrains Mono";opacity:.7}
+/* agents */
+.crew{display:grid;grid-template-columns:repeat(5,1fr);gap:10px;margin-top:18px}
+.tile{border-radius:18px;padding:0 0 10px;text-align:center;position:relative;overflow:hidden}
+.av{display:block;height:128px;margin:0 auto;mix-blend-mode:multiply;object-fit:contain}
+.tile b{display:block;font-size:13px;margin-top:4px}.tile .p{font:700 15px "JetBrains Mono"}
+.w{position:absolute;top:8px;right:8px;background:#fff;border-radius:99px;font:700 10px "JetBrains Mono";padding:3px 7px;box-shadow:0 2px 0 #0002}
+.sticker{position:absolute;left:6px;top:8px;background:var(--lime);border:1.5px solid var(--ink);border-radius:8px;font:700 9px "JetBrains Mono";padding:2px 5px;transform:rotate(-6deg)}
+/* side */
+.side{display:flex;flex-direction:column;gap:18px}
+.panel{background:#fff;border-radius:22px;padding:18px 20px}
+.race{position:relative;margin-top:10px}
+.lane{position:relative;height:46px;border-bottom:1.5px dashed var(--line);display:flex;align-items:center}
+.lane:last-child{border-bottom:none}
+.lane .name{width:92px;font-weight:700;font-size:13px}
+.track{flex:1;position:relative;height:100%;background:repeating-linear-gradient(90deg,transparent 0 24%,#f1eee6 24% 25%)}
+.runner{position:absolute;top:50%;transform:translate(-50%,-50%);width:38px;height:38px;border-radius:12px;border:2px solid #fff;box-shadow:0 3px 8px #0003;background:#f6f4ee;object-fit:cover}
+.runner.src{background-image:none;display:grid;place-items:center;font:800 13px "Bricolage Grotesque";color:#fff}
+.trail{position:absolute;top:50%;height:4px;margin-top:-2px;border-radius:4px;opacity:.5}
+.delta{position:absolute;top:50%;transform:translateY(-50%);font:700 11px "JetBrains Mono"}
+.finish{position:absolute;right:0;top:0;bottom:0;width:6px;background:repeating-linear-gradient(0deg,var(--ink) 0 6px,#fff 6px 12px)}
+.carbon{background:#e9edff;border-radius:20px;padding:16px 18px;border:1.5px dashed #b6c1f6}
+.mem{display:flex;gap:10px;align-items:flex-start;padding:8px 0;border-bottom:1px solid #f0ede5;font-size:13px}.mem:last-child{border:none}
+.mem i{font-style:normal;font:700 10px "JetBrains Mono";padding:3px 6px;border-radius:6px;background:var(--bg);white-space:nowrap}
+.ok{color:var(--fb)}
+.note{position:fixed;top:8px;right:12px;font:10px "JetBrains Mono";color:var(--mute)}
+</style></head><body>
+<div class="note">C2 · SLIP · working name "Called It" · sample data</div>
+<header><div class="logo"><i>✓</i>called it</div>
+<nav><span class="on">🔥 Closing soon</span><span>🗳 Midterms</span><span>⚽ Football</span><span>₿ Crypto</span><span>🎬 Culture</span><span>🏁 The race</span></nav>
+<span class="bal">4.20 SUI</span><span class="lip">0x7d…31</span></header>
+<main>
+<section>
+ <div class="deck"><div class="ghost g2"></div><div class="ghost"></div>
+ <div class="slip"><div class="band"><span>🗳 POLITICS · MIDTERMS</span><span>SLIP 3 OF 24 · SWIPE ← NO · YES →</span></div>
+ <div class="holes"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
+ <div class="body">
+  <div class="qrow"><h1>Will the Democrats control the Senate after the midterms?</h1>
+   <div class="clock"><div>05<small>DAYS</small></div><div>11<small>HRS</small></div><div>42<small>MIN</small></div></div></div>
+  <div class="k" style="margin-bottom:22px">Trust line · weighted by who's been right</div>
+  <div class="meter"><div class="seg" style="width:64%;background:var(--pol)">YES 64%</div><div class="seg" style="flex:1;background:#dcdcec;color:#555">NO 36%</div>
+   <div class="tick" style="left:68%"><span>POLY 68</span></div></div>
+  <div class="refs"><div class="ref"><span class="k">Polymarket</span><b>68%</b></div><div class="ref"><span class="k">SUI pool · 2.41</span><b>59%</b></div><div class="ref" style="background:#fdecec"><span class="k">Sources disagree</span><b style="color:var(--red)">Δ 4 pts</b></div></div>
+  <div class="stake"><span class="k" style="border:none;padding:0 4px 0 0">Stake</span><span>0.05</span><span class="on">0.10</span><span>0.50</span><span>1 SUI</span><div class="conf"></div></div>
+  <div class="cta"><div style="background:#fff;border:2px solid var(--ink);box-shadow:0 5px 0 var(--ink)">← NO <small>pays 2.6×</small></div><div style="background:var(--pol);color:#fff">YES → <small>pays 1.6×</small></div></div>
+  <div class="crew">
+   <div class="tile" style="background:var(--q)"><span class="w">2.1×</span><img class="av" src="tile-quant.png" alt=""><b>The Quant</b><span class="p">64%</span></div>
+   <div class="tile" style="background:var(--c)"><span class="sticker">LESSON ✓</span><span class="w">0.7×</span><img class="av" src="tile-contrarian.png" alt=""><b>Contrarian</b><span class="p">58%</span></div>
+   <div class="tile" style="background:var(--f)"><span class="w">1.0×</span><img class="av" src="tile-form.png" alt=""><b>Form Guide</b><span class="p">61%</span></div>
+   <div class="tile" style="background:var(--s)"><span class="w">1.4×</span><img class="av" src="tile-skeptic.png" alt=""><b>Skeptic</b><span class="p">45%</span></div>
+   <div class="tile" style="background:var(--n)"><span class="w">1.2×</span><img class="av" src="tile-newsroom.png" alt=""><b>Newsroom</b><span class="p">70%</span></div>
+  </div>
+ </div></div></div>
+</section>
+<aside class="side">
+ <div class="panel"><div style="display:flex;justify-content:space-between"><span class="k">🏁 The race · politics · week 2</span><span class="k">skill →</span></div>
+  <div class="race">
+   <div class="lane"><span class="name">Polymarket</span><div class="track"><div class="trail" style="left:55%;width:27%;background:#7b61ff"></div><div class="runner src" style="left:82%;background:#7b61ff">PM</div><span class="delta ok" style="left:89%">▲3</span><div class="finish"></div></div></div>
+   <div class="lane"><span class="name">The Quant</span><div class="track"><div class="trail" style="left:40%;width:34%;background:var(--pol)"></div><img class="runner" src="head-quant.png" style="left:74%" alt=""><span class="delta ok" style="left:81%">▲5</span><div class="finish"></div></div></div>
+   <div class="lane"><span class="name">Bookies</span><div class="track"><div class="runner src" style="left:66%;background:#0f766e">BK</div><span class="delta" style="left:73%">–</span><div class="finish"></div></div></div>
+   <div class="lane"><span class="name">Newsroom</span><div class="track"><div class="trail" style="left:48%;width:10%;background:var(--cr)"></div><img class="runner" src="head-newsroom.png" style="left:58%" alt=""><span class="delta ok" style="left:65%">▲1</span><div class="finish"></div></div></div>
+   <div class="lane"><span class="name">You</span><div class="track"><div class="runner src" style="left:44%;background:var(--ink)">7d</div><span class="delta" style="left:51%">new</span><div class="finish"></div></div></div>
+   <div class="lane"><span class="name">Contrarian</span><div class="track"><div class="trail" style="left:30%;width:22%;background:var(--red)"></div><img class="runner" src="head-contrarian.png" style="left:30%" alt=""><span class="delta" style="left:37%;color:var(--red)">▼4</span><div class="finish"></div></div></div>
+  </div></div>
+ <div class="carbon"><div class="k">Your slip · carbon copy</div>
+  <div style="font:800 19px 'Bricolage Grotesque';margin:6px 0">YES · 0.10 SUI · 70% sure</div>
+  <div class="mono" style="font-size:11.5px;color:#4b55a8">ticket 0x3a…9e on Sui · note hash 9f2c…e01b<br>remembered on Walrus · signed 5d 11h before close ✓</div></div>
+ <div class="panel"><div class="k">Walrus memory · live</div>
+  <div class="mem"><i>lessons</i><span><b>Contrarian</b> wrote: “Fade a favourite only when its price moved 5+ pts in a day with no news.”</span></div>
+  <div class="mem"><i>scorecards</i><span><b>Skeptic</b> WRONG on Grizzlies vs Blazers · Brier 0.62</span></div>
+  <div class="mem"><i>picks</i><span><b>0x7d…31</b> backed YES on the Senate · 70% <span class="ok">stored ✓</span></span></div>
+ </div>
+</aside>
+</main>
+</body></html>
