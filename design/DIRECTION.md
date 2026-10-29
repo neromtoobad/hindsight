@@ -17,3 +17,6 @@ Light, game-energy pick slip. Every market is a punched slip in a swipeable deck
 
 ## Characters
 Higgsfield nano_banana_pro lineup, job 04468114-6408-4278-9de4-5555ab88473b, 2 credits (design/agents-lineup.png). Crops in public/mockups/tile-*.png, head-*.png. Next: pose sheets per agent (confident / wrong / lesson / win) mapped to real state.
+
+## Logo
+"Eyes in the rear-view mirror": a tilted mirror on its stem, lime glass, two clay-style eyes glancing back. Looking back = hindsight; the eyes match the agent characters. Source of truth: app/icon.svg (favicon) and components/Logo.tsx (header). Options considered: design/logos.png (A–C, rejected), design/logos2.png (D1 chosen).

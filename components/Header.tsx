@@ -1,12 +1,14 @@
 "use client";
 import { CATS } from "./meta";
 import { WalletButton } from "./Wallet";
+import { Mark } from "./Logo";
 
 export function Header({ cat, setCat, counts }: { cat?: string; setCat?: (c: string) => void; counts?: Record<string, number> }) {
   return (
     <header className="top">
-      <a className="logo" href="/">
-        <i>👁</i>hindsight
+      <a className="logo" href="/" aria-label="Hindsight home">
+        <Mark size={46} />
+        hindsight
       </a>
       {setCat && (
         <nav className="chips">

@@ -32,8 +32,9 @@ textarea, input { font: inherit; }
 
 /* header */
 .top { display: flex; align-items: center; gap: 16px; padding: 16px 32px; flex-wrap: wrap; }
-.logo { display: flex; align-items: center; gap: 9px; font: 800 25px var(--display); letter-spacing: -1px; }
-.logo i { width: 30px; height: 30px; border-radius: 10px; background: var(--lime); display: grid; place-items: center; font-style: normal; font-size: 15px; border: 2px solid var(--ink); box-shadow: 0 3px 0 var(--ink); }
+.logo { display: flex; align-items: center; gap: 6px; font: 800 27px var(--display); letter-spacing: -1.2px; }
+.logo svg { margin-top: -4px; transition: transform .2s; }
+.logo:hover svg { transform: rotate(-6deg); }
 .chips { display: flex; gap: 6px; overflow-x: auto; scrollbar-width: none; }
 .chip { padding: 8px 13px; border-radius: 99px; background: #fff; font-weight: 600; font-size: 14px; border: 1.5px solid var(--line); white-space: nowrap; }
 .chip.on { background: var(--ink); color: #fff; border-color: var(--ink); }

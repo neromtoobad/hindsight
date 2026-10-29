@@ -1,0 +1,65 @@
+<!doctype html>
+<html><head><meta charset="utf-8">
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,800&family=JetBrains+Mono:wght@700&display=swap" rel="stylesheet">
+<style>
+body{margin:0;background:#f2efe8;font-family:"Bricolage Grotesque",system-ui;color:#141414}
+.sheet{display:grid;grid-template-columns:repeat(3,1fr);gap:22px;padding:28px}
+.opt{background:#fff;border-radius:26px;padding:26px 24px 20px;display:flex;flex-direction:column;gap:22px;align-items:flex-start}
+.k{font:700 11px "JetBrains Mono";letter-spacing:1.2px;text-transform:uppercase;color:#8d8a82}
+.lock{display:flex;align-items:center;gap:12px;font-weight:800;font-size:40px;letter-spacing:-1.8px}
+.lock svg{width:54px;height:54px}
+.big{width:150px;height:150px;align-self:center}
+.dark{background:#141414;border-radius:18px;padding:14px 18px;color:#fff;align-self:stretch;display:flex;gap:14px;align-items:center}
+.dark svg{width:40px;height:40px}.fav{display:flex;gap:10px;align-items:end}.fav svg{width:16px;height:16px}.fav svg+svg{width:32px;height:32px}
+</style></head><body>
+<svg width="0" height="0" style="position:absolute">
+  <defs>
+    <!-- A: rear-view mirror with a mirrored check -->
+    <symbol id="A" viewBox="0 0 64 64">
+      <rect x="27" y="3" width="10" height="13" rx="4" fill="#141414"/>
+      <g transform="rotate(-9 32 34)">
+        <rect x="5" y="19" width="54" height="35" rx="17.5" fill="#141414"/>
+        <rect x="5" y="15" width="54" height="35" rx="17.5" fill="#c6f432" stroke="#141414" stroke-width="4"/>
+        <path d="M14 24 Q18 19 25 19" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round" opacity=".8"/>
+        <path d="M44 31 L37 39 L20 26" fill="none" stroke="#141414" stroke-width="5.5" stroke-linecap="round" stroke-linejoin="round"/>
+      </g>
+    </symbol>
+    <!-- B: eye whose pupil is a rewind arrow -->
+    <symbol id="B" viewBox="0 0 64 64">
+      <path d="M4 34 Q32 6 60 34 Q32 62 4 34 Z" fill="#141414"/>
+      <path d="M4 31 Q32 3 60 31 Q32 59 4 31 Z" fill="#fff" stroke="#141414" stroke-width="4" stroke-linejoin="round"/>
+      <circle cx="32" cy="31" r="13" fill="#c6f432" stroke="#141414" stroke-width="3.5"/>
+      <path d="M38 27.5 A7 7 0 1 0 38.6 34" fill="none" stroke="#141414" stroke-width="3.5" stroke-linecap="round"/>
+      <path d="M33.5 26 L39 27.8 L37.4 22" fill="none" stroke="#141414" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"/>
+    </symbol>
+    <!-- C: punched slip with a check, folded back like a page turned in time -->
+    <symbol id="C" viewBox="0 0 64 64">
+      <path d="M10 10 H46 L56 20 V56 H10 Z" fill="#141414" transform="translate(0 4)"/>
+      <path d="M10 8 H44 L54 18 V54 H10 Z" fill="#c6f432" stroke="#141414" stroke-width="4" stroke-linejoin="round"/>
+      <path d="M44 8 V18 H54" fill="#fff" stroke="#141414" stroke-width="4" stroke-linejoin="round"/>
+      <circle cx="18" cy="17" r="2.6" fill="#141414"/><circle cx="26" cy="17" r="2.6" fill="#141414"/><circle cx="34" cy="17" r="2.6" fill="#141414"/>
+      <path d="M19 37 L27 45 L44 28" fill="none" stroke="#141414" stroke-width="5.5" stroke-linecap="round" stroke-linejoin="round"/>
+    </symbol>
+  </defs>
+</svg>
+<div class="sheet">
+  <div class="opt"><span class="k">A · Rear-view call (recommended)</span>
+    <svg class="big"><use href="#A"/></svg>
+    <div class="lock"><svg><use href="#A"/></svg>hindsight</div>
+    <div class="dark"><svg><use href="#A"/></svg><b style="font-size:24px">hindsight</b></div>
+    <div class="fav"><svg><use href="#A"/></svg><svg><use href="#A"/></svg><span class="k">favicon 16 / 32</span></div>
+  </div>
+  <div class="opt"><span class="k">B · Eye that rewinds</span>
+    <svg class="big"><use href="#B"/></svg>
+    <div class="lock"><svg><use href="#B"/></svg>hindsight</div>
+    <div class="dark"><svg><use href="#B"/></svg><b style="font-size:24px">hindsight</b></div>
+    <div class="fav"><svg><use href="#B"/></svg><svg><use href="#B"/></svg><span class="k">favicon 16 / 32</span></div>
+  </div>
+  <div class="opt"><span class="k">C · The slip</span>
+    <svg class="big"><use href="#C"/></svg>
+    <div class="lock"><svg><use href="#C"/></svg>hindsight</div>
+    <div class="dark"><svg><use href="#C"/></svg><b style="font-size:24px">hindsight</b></div>
+    <div class="fav"><svg><use href="#C"/></svg><svg><use href="#C"/></svg><span class="k">favicon 16 / 32</span></div>
+  </div>
+</div>
+</body></html>
