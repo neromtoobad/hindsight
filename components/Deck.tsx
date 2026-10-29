@@ -4,7 +4,7 @@ import { useCurrentAccount, useDAppKit } from "@mysten/dapp-kit-react";
 import { Transaction } from "@mysten/sui/transactions";
 import { AGENTS, AGENT_IDS, api, catColor, catIcon, payout, pct, sui, type Card, type Detail } from "./meta";
 
-const STAKES = [50_000_000n, 100_000_000n, 500_000_000n, 1_000_000_000n];
+const STAKES = [10_000_000n, 50_000_000n, 100_000_000n, 500_000_000n, 1_000_000_000n];
 
 function useCountdown(to: number) {
   const [now, setNow] = useState(Date.now());
@@ -97,7 +97,7 @@ function Slip({ card, index, total, onPicked, toast }: { card: Card; index: numb
   const kit = useDAppKit();
   const t = useCountdown(card.closesAt);
   const [detail, setDetail] = useState<Detail | null>(null);
-  const [stake, setStake] = useState(STAKES[1]);
+  const [stake, setStake] = useState(STAKES[2]);
   const [conf, setConf] = useState(0.65);
   const [why, setWhy] = useState("");
   const [busy, setBusy] = useState<number | null>(null);

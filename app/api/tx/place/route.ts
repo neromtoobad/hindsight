@@ -32,6 +32,9 @@ export async function POST(req: Request) {
     const bytes = await tx.build({ client: sui() });
     return Response.json({ bytes: toBase64(bytes) });
   } catch (e) {
-    return Response.json({ error: (e as Error).message.slice(0, 200) }, { status: 400 });
+    const msg = (e as Error).message;
+    if (/InsufficientCoinBalance|insufficient SUI balance|gas selection/i.test(msg))
+      return Response.json({ error: `Not enough SUI in this wallet for a ${Number(b.stakeMist) / 1e9} SUI stake plus gas. Pick a smaller stake or top up.` }, { status: 400 });
+    return Response.json({ error: msg.slice(0, 200) }, { status: 400 });
   }
 }
