@@ -189,7 +189,7 @@ function Slip({ card, index, total, onPicked, toast }: { card: Card; index: numb
             <div
               key={o}
               className="seg"
-              style={{ width: pct(card.trust[j]), background: j === 0 ? "var(--c0)" : OUTCOME_COLORS[j] ?? "#bbb", color: j === 1 && binary ? "#555" : "#fff" }}
+              style={{ width: pct(card.trust[j]), background: j === 0 ? "var(--c0)" : OUTCOME_COLORS[j] ?? "#bbb", color: j === 1 ? "#555" : "#fff" }}
               title={`${o} ${pct(card.trust[j])}`}
             >
               {card.trust[j] > 0.16 ? `${binary ? o.toUpperCase() : o} ${pct(card.trust[j])}` : ""}
@@ -264,7 +264,7 @@ function Slip({ card, index, total, onPicked, toast }: { card: Card; index: numb
                 <img src={`/agents/${a.slug}.png`} alt={a.short} />
                 <b>{a.short}</b>
                 {p ? (
-                  <span className="p">{binary ? pct(p.probs[0]) : `${card.outcomes[top].split(" ")[0].slice(0, 8)} ${pct(p.probs[top])}`}</span>
+                  <span className="p">{binary ? pct(p.probs[0]) : `${card.outcomes[top].split(" ")[0].slice(0, 10)} ${pct(p.probs[top])}`}</span>
                 ) : (
                   <span className="tbd">thinking…</span>
                 )}
