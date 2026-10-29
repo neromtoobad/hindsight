@@ -6,6 +6,9 @@ export const LEAGUES: Record<string, string> = {
   "uefa.champions": "Champions League",
   "esp.1": "La Liga",
   "ita.1": "Serie A",
+  "ger.1": "Bundesliga",
+  "fra.1": "Ligue 1",
+  "uefa.europa": "Europa League",
 };
 
 /** American odds to raw implied probability. */

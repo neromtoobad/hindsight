@@ -55,14 +55,14 @@ function closesAt(m: GammaMarket, ev: GammaEvent): number {
   return end - 12 * 3600_000;
 }
 
-const QUOTA: Record<Category, number> = { politics: 6, crypto: 3, sports: 5, culture: 3, other: 2, football: 2 };
+const QUOTA: Record<Category, number> = { politics: 8, crypto: 6, sports: 8, culture: 5, other: 4, football: 3 };
 
 /** Contested binary markets that close in the next few days, spread across categories. */
 export async function discover(now = Date.now(), horizonDays = 8): Promise<MarketRec[]> {
   const min = new Date(now + 6 * 3600_000).toISOString();
   const max = new Date(now + horizonDays * 86400_000).toISOString();
   const events = await get<GammaEvent[]>(
-    `/events?active=true&closed=false&limit=150&order=volume24hr&ascending=false&end_date_min=${min}&end_date_max=${max}`,
+    `/events?active=true&closed=false&limit=250&order=volume24hr&ascending=false&end_date_min=${min}&end_date_max=${max}`,
   );
   const taken: Record<string, number> = {};
   const out: MarketRec[] = [];

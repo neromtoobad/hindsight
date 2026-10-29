@@ -3,7 +3,19 @@ import { CATS } from "./meta";
 import { WalletButton } from "./Wallet";
 import { Mark } from "./Logo";
 
-export function Header({ cat, setCat, counts }: { cat?: string; setCat?: (c: string) => void; counts?: Record<string, number> }) {
+export function Header({
+  cat,
+  setCat,
+  counts,
+  myBets,
+  onMyBets,
+}: {
+  cat?: string;
+  setCat?: (c: string) => void;
+  counts?: Record<string, number>;
+  myBets?: number;
+  onMyBets?: () => void;
+}) {
   return (
     <header className="top">
       <a className="logo" href="/" aria-label="Hindsight home">
@@ -11,16 +23,27 @@ export function Header({ cat, setCat, counts }: { cat?: string; setCat?: (c: str
         hindsight
       </a>
       {setCat && (
-        <nav className="chips">
+        <nav className="chips mobile-only">
           {CATS.filter((c) => c.id === "all" || counts?.[c.id]).map((c) => (
             <button key={c.id} className={`chip ${cat === c.id ? "on" : ""}`} onClick={() => setCat(c.id)}>
-              {c.icon}&nbsp;{c.label}
+              {c.icon}&nbsp;{c.id === "all" ? "All" : c.label}
               {counts?.[c.id] ? <span className="n">{counts[c.id]}</span> : null}
             </button>
           ))}
         </nav>
       )}
-      <WalletButton />
+      <div className="wallet">
+        {onMyBets ? (
+          <button className="mybets" onClick={onMyBets}>
+            My bets{myBets ? <span className="badge">{myBets}</span> : null}
+          </button>
+        ) : (
+          <a className="mybets" href="/#slip">
+            My bets
+          </a>
+        )}
+        <WalletButton />
+      </div>
     </header>
   );
 }
