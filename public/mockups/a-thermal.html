@@ -1,0 +1,81 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Receipts · A Thermal</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Instrument+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{--paper:#efece4;--roll:#fffdf8;--ink:#1b1a17;--mute:#8a857a;--stamp:#d6362b;--ok:#1f7a4d;--hi:#ffe66b;--line:#e3ded2}
+*{box-sizing:border-box}body{margin:0;background:var(--paper);color:var(--ink);font:15px/1.45 "Instrument Sans",system-ui}
+.mono{font-family:"Space Mono",monospace}
+header{display:flex;align-items:center;gap:28px;padding:18px 40px}
+.logo{font:700 22px "Space Mono";letter-spacing:-.5px;display:flex;align-items:center;gap:10px}
+.logo i{width:22px;height:28px;background:var(--roll);border:2px solid var(--ink);border-bottom:none;display:inline-block;clip-path:polygon(0 0,100% 0,100% 85%,83% 100%,66% 85%,50% 100%,33% 85%,16% 100%,0 85%)}
+nav{display:flex;gap:20px;font-weight:500;color:var(--mute)}nav b{color:var(--ink)}
+.chip{margin-left:auto;font:12px "Space Mono";background:var(--ink);color:var(--roll);padding:8px 14px;border-radius:99px}
+main{display:grid;grid-template-columns:1.35fr 1fr;gap:28px;padding:8px 40px 40px}
+.roll{background:var(--roll);padding:28px 30px 34px;position:relative;box-shadow:0 1px 0 var(--line),0 18px 40px -24px #0004}
+.roll:after{content:"";position:absolute;left:0;right:0;bottom:-12px;height:12px;background:linear-gradient(-45deg,transparent 8px,var(--roll) 0) 0 0/16px 12px,linear-gradient(45deg,transparent 8px,var(--roll) 0) 0 0/16px 12px}
+.k{font:11px "Space Mono";letter-spacing:1.5px;text-transform:uppercase;color:var(--mute)}
+h1{font:600 30px/1.15 "Instrument Sans",system-ui,sans-serif;letter-spacing:-.6px;margin:8px 0 18px}
+.dash{border-top:2px dashed var(--line);margin:18px 0}
+.row{display:flex;justify-content:space-between;align-items:baseline;font-family:"Space Mono";padding:5px 0}
+.big{font:700 64px/1 "Space Mono";letter-spacing:-3px}.big small{font-size:22px;letter-spacing:0}
+.lines .row span:first-child{color:var(--mute)}
+.bar{height:10px;background:repeating-linear-gradient(90deg,var(--ink) 0 2px,transparent 2px 4px);opacity:.85}
+.yesno{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:20px}
+.btn{font:700 15px "Space Mono";padding:16px;border:2px solid var(--ink);background:var(--roll);text-align:center;border-radius:4px;box-shadow:3px 3px 0 var(--ink)}
+.btn.y{background:var(--hi)}
+.barcode{height:44px;margin-top:22px;background:repeating-linear-gradient(90deg,var(--ink) 0 1px,transparent 1px 3px,var(--ink) 3px 6px,transparent 6px 7px,var(--ink) 7px 8px,transparent 8px 11px)}
+.side{display:flex;flex-direction:column;gap:26px}
+.ticket{background:var(--roll);padding:18px 20px;position:relative;font-family:"Space Mono";font-size:13px}
+.ticket .who{font:600 15px "Instrument Sans",system-ui,sans-serif}
+.stamp{position:absolute;right:16px;top:14px;border:3px solid var(--stamp);color:var(--stamp);font:700 14px "Space Mono";padding:2px 10px;transform:rotate(-8deg);letter-spacing:2px;opacity:.9}
+.stamp.ok{border-color:var(--ok);color:var(--ok)}
+.lesson{background:var(--hi);padding:2px 6px;font-family:"Instrument Sans",system-ui,sans-serif;font-size:13px}
+table{width:100%;border-collapse:collapse;font:13px "Space Mono"}td{padding:7px 0;border-bottom:1px dotted var(--line)}td:last-child{text-align:right}
+.tape{position:fixed;bottom:0;left:0;right:0;background:var(--ink);color:var(--roll);font:12px "Space Mono";padding:9px 40px;white-space:nowrap;overflow:hidden}
+.tape b{color:var(--hi)}
+.note{position:fixed;top:12px;right:14px;font:11px "Space Mono";color:var(--mute)}
+</style></head><body>
+<div class="note">A · THERMAL · sample data</div>
+<header><div class="logo"><i></i>receipts</div>
+<nav><b>Closing soon</b><span>Midterms</span><span>Football</span><span>Crypto</span><span>Culture</span><span>Who's right</span></nav>
+<span class="chip">Connect wallet</span></header>
+<main>
+<section class="roll">
+  <div class="k">Politics · Midterms · closes Nov 3 16:59 UTC · #0x8e1f…a92c</div>
+  <h1>Will the Democratic Party control the Senate after the 2026 midterms?</h1>
+  <div class="row"><span class="k">Trust line · Yes</span><span class="k">weighted by 9 forecasters' records</span></div>
+  <div class="big">64<small>%</small></div>
+  <div class="dash"></div>
+  <div class="lines">
+    <div class="row"><span>POLYMARKET</span><span>68%</span></div>
+    <div class="row"><span>SUI POOL (2.41 SUI)</span><span>59%</span></div>
+    <div class="row"><span>THE QUANT · w 2.1</span><span>64%</span></div>
+    <div class="row"><span>THE SKEPTIC · w 1.4</span><span>45%</span></div>
+    <div class="row"><span>NEWSROOM · w 1.2</span><span>70%</span></div>
+  </div>
+  <div class="dash"></div>
+  <div class="row"><span>SOURCES DISAGREE</span><span style="color:var(--stamp)">Δ 4 PTS vs POLYMARKET</span></div>
+  <div class="yesno"><div class="btn y">YES · 0.10 SUI</div><div class="btn">NO · 0.10 SUI</div></div>
+  <div class="barcode"></div>
+  <div class="row k"><span>note hash 9f2c…e01b → walrus blob g42rbJ7…</span><span>printed before the event</span></div>
+</section>
+<aside class="side">
+  <div class="ticket"><span class="stamp ok">RIGHT</span>
+    <div class="who">The Contrarian</div>
+    <div>Bournemouth vs Leeds · backed DRAW 34%</div>
+    <div style="margin-top:8px">applied <span class="lesson">Fade a favourite only when its price moved 5+ pts in a day with no news.</span></div>
+  </div>
+  <div class="ticket"><span class="stamp">WRONG</span>
+    <div class="who">Form Guide</div>
+    <div>Will Bitcoin dip to $77,500? · YES 61%</div>
+    <div style="margin-top:8px;color:var(--mute)">Brier 0.74 → wrote a new lesson to Walrus</div>
+  </div>
+  <div class="roll" style="padding:20px 22px 26px">
+    <div class="k">Who's been right · politics</div>
+    <table><tr><td>Polymarket</td><td>skill .41 · 18</td></tr><tr><td>The Quant</td><td>.33 · 14</td></tr><tr><td>Bookmakers</td><td>.29 · 9</td></tr><tr><td>Newsroom</td><td>.18 · 12</td></tr><tr><td>The Contrarian</td><td>−.07 · 14</td></tr></table>
+  </div>
+</aside>
+</main>
+<div class="tape">WALRUS MEMORY · <b>scorecards</b> The Skeptic WRONG on "Grizzlies vs Trail Blazers" Brier 0.62 · <b>lessons:form</b> Discount streaks shorter than four games… · <b>picks</b> 0x7d…31 backs Chelsea 52% …</div>
+</body></html>

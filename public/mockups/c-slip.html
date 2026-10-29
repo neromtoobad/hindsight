@@ -1,0 +1,71 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Receipts · C Slip</title>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#f3f1ec;--slip:#ffffff;--ink:#141414;--mute:#8b8a85;--pol:#5b5bf0;--fb:#12a36b;--cr:#f59e0b;--cu:#ec4899;--red:#ef4444;--carbon:#e8edff}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.4 "Bricolage Grotesque",system-ui}
+.mono{font-family:"JetBrains Mono",monospace}
+header{display:flex;align-items:center;gap:22px;padding:18px 36px}
+.logo{font:800 26px "Bricolage Grotesque";letter-spacing:-1px}
+nav{display:flex;gap:8px}nav span{padding:8px 14px;border-radius:99px;background:#fff;font-weight:500;font-size:14px;border:1.5px solid #e4e1d8}nav span.on{background:var(--ink);color:#fff;border-color:var(--ink)}
+.btn{margin-left:auto;background:var(--ink);color:#fff;font-weight:700;padding:11px 18px;border-radius:12px;box-shadow:0 4px 0 #000}
+main{display:grid;grid-template-columns:1.3fr 1fr;gap:26px;padding:10px 36px 36px}
+.slip{background:var(--slip);border-radius:22px;overflow:hidden;box-shadow:0 2px 0 #e2ded4,0 24px 40px -28px #0005;position:relative}
+.band{background:var(--pol);color:#fff;padding:14px 26px;display:flex;justify-content:space-between;font:700 13px "JetBrains Mono";letter-spacing:1px}
+.holes{position:absolute;left:0;right:0;top:46px;display:flex;justify-content:space-between;padding:0 10px}.holes i{width:14px;height:14px;border-radius:50%;background:var(--bg);margin-top:-7px}
+.body{padding:24px 26px}
+h1{font:800 34px/1.05 "Bricolage Grotesque";letter-spacing:-1.2px;margin:0 0 20px}
+.meter{display:flex;height:58px;border-radius:14px;overflow:hidden;font:800 22px "Bricolage Grotesque";color:#fff}
+.meter div{display:flex;align-items:center;padding:0 18px}
+.refs{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin:16px 0}
+.ref{background:var(--bg);border-radius:14px;padding:12px 14px}.ref b{font:800 26px "Bricolage Grotesque";display:block}
+.k{font:11px "JetBrains Mono";letter-spacing:1px;text-transform:uppercase;color:var(--mute)}
+.cta{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.cta div{padding:18px;border-radius:16px;text-align:center;font:800 18px "Bricolage Grotesque";box-shadow:0 5px 0 #0003}
+.agents{display:grid;grid-template-columns:repeat(5,1fr);gap:10px;margin-top:18px}
+.ag{background:var(--bg);border-radius:16px;padding:10px 6px 10px;text-align:center;font-size:12px;font-weight:600}
+.bot{width:54px;height:54px;margin:0 auto 6px;border-radius:18px;background:radial-gradient(circle at 35% 30%,#fff 0 12%,transparent 13%),radial-gradient(circle at 65% 30%,#fff 0 12%,transparent 13%),linear-gradient(160deg,var(--c),#0003);box-shadow:inset 0 -6px 0 #0002,0 6px 10px -4px #0004}
+.ag .p{font:700 13px "JetBrains Mono"}
+.side{display:flex;flex-direction:column;gap:20px}
+.carbon{background:var(--carbon);border-radius:18px;padding:18px 20px;border:1.5px dashed #b9c3f5}
+.lb{background:#fff;border-radius:18px;padding:16px 20px}
+.lbr{display:flex;align-items:center;gap:12px;padding:9px 0;border-bottom:1px solid #eee}.lbr .bot{width:34px;height:34px;border-radius:11px;margin:0}
+.lbr b{margin-left:auto;font:700 14px "JetBrains Mono"}
+.note{position:fixed;top:12px;right:14px;font:11px "JetBrains Mono";color:var(--mute)}
+</style></head><body>
+<div class="note">C · SLIP · sample data · bots are placeholders for 3D renders</div>
+<header><div class="logo">receipts</div>
+<nav><span class="on">Closing soon</span><span>🗳 Midterms</span><span>⚽ Football</span><span>₿ Crypto</span><span>🎬 Culture</span><span>🏆 Who's right</span></nav>
+<span class="btn">Connect</span></header>
+<main>
+<section class="slip"><div class="band"><span>POLITICS · MIDTERMS</span><span>CLOSES NOV 3 · 16:59 UTC</span></div>
+<div class="holes"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
+<div class="body">
+  <h1>Will the Democrats control the Senate after the midterms?</h1>
+  <div class="k" style="margin-bottom:8px">Trust line · weighted by who's been right</div>
+  <div class="meter"><div style="width:64%;background:var(--pol)">YES 64%</div><div style="flex:1;background:#d9d9e8;color:#444">NO 36%</div></div>
+  <div class="refs"><div class="ref"><span class="k">Polymarket</span><b>68%</b></div><div class="ref"><span class="k">SUI pool · 2.41</span><b>59%</b></div><div class="ref" style="background:#fdecec"><span class="k">Disagree</span><b style="color:var(--red)">Δ4</b></div></div>
+  <div class="cta"><div style="background:var(--pol);color:#fff">Back YES</div><div style="background:var(--ink);color:#fff">Back NO</div></div>
+  <div class="agents">
+    <div class="ag"><div class="bot" style="--c:#5b5bf0"></div>Quant<div class="p">64%</div></div>
+    <div class="ag"><div class="bot" style="--c:#ef4444"></div>Contrarian<div class="p">58%</div></div>
+    <div class="ag"><div class="bot" style="--c:#12a36b"></div>Form<div class="p">61%</div></div>
+    <div class="ag"><div class="bot" style="--c:#8b8a85"></div>Skeptic<div class="p">45%</div></div>
+    <div class="ag"><div class="bot" style="--c:#f59e0b"></div>Newsroom<div class="p">70%</div></div>
+  </div>
+</div></section>
+<aside class="side">
+  <div class="carbon"><div class="k">Your receipt · carbon copy</div>
+    <div style="font:800 20px 'Bricolage Grotesque';margin:6px 0">YES · 0.10 SUI · 70% sure</div>
+    <div class="mono" style="font-size:12px;color:#4b55a8">ticket 0x3a…9e · note hash 9f2c…e01b<br>walrus blob g42rbJ7… · before close ✓</div></div>
+  <div class="lb"><div class="k">Who's been right · politics</div>
+    <div class="lbr"><div class="bot" style="--c:#7b61ff"></div>Polymarket<b>.41</b></div>
+    <div class="lbr"><div class="bot" style="--c:#5b5bf0"></div>The Quant<b>.33</b></div>
+    <div class="lbr"><div class="bot" style="--c:#12a36b"></div>Bookmakers<b>.29</b></div>
+    <div class="lbr"><div class="bot" style="--c:#f59e0b"></div>Newsroom<b>.18</b></div>
+    <div class="lbr"><div class="bot" style="--c:#ef4444"></div>The Contrarian<b style="color:var(--red)">−.07</b></div></div>
+  <div class="lb" style="background:#fff7e0"><div class="k">Contrarian learned · from Walrus</div><div style="font-weight:600;margin-top:6px">"Fade a favourite only when its price moved 5+ pts in a day with no news."</div></div>
+</aside>
+</main>
+</body></html>

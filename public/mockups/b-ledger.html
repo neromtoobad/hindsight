@@ -1,0 +1,73 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Receipts · B Ledger</title>
+<link href="https://fonts.googleapis.com/css2?family=Newsreader:opsz,wght@6..72,400;6..72,500;6..72,600&family=IBM+Plex+Mono:wght@400;500&family=Inter:wght@400;500;600&family=Caveat:wght@600&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#f7f3ea;--card:#fffefa;--ink:#1d2320;--mute:#7c7d74;--rule:#cfe0d3;--green:#2f6b4f;--red:#c0392b;--line:#e6e0d2}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.5 Inter,system-ui}
+.mono{font-family:"IBM Plex Mono",monospace}
+header{display:flex;align-items:baseline;gap:30px;padding:22px 44px 14px;border-bottom:1px solid var(--line)}
+.logo{font:600 30px "Newsreader";letter-spacing:-.8px}.logo em{color:var(--green)}
+nav{display:flex;gap:22px;font-size:14px;color:var(--mute)}nav b{color:var(--ink);border-bottom:2px solid var(--green)}
+.date{margin-left:auto;font:12px "IBM Plex Mono";color:var(--mute)}
+main{display:grid;grid-template-columns:1.4fr 1fr;gap:36px;padding:28px 44px}
+.k{font:11px "IBM Plex Mono";letter-spacing:1.2px;text-transform:uppercase;color:var(--mute)}
+h1{font:500 40px/1.08 "Newsreader";letter-spacing:-1px;margin:10px 0 22px}
+.ledger{background:var(--card);border:1px solid var(--line);border-radius:6px;background-image:repeating-linear-gradient(var(--card) 0 35px,var(--rule) 35px 36px);padding:0 22px;position:relative}
+.ledger:before{content:"";position:absolute;left:180px;top:0;bottom:0;border-left:1px solid #e9b8b0}
+.lr{display:grid;grid-template-columns:158px 1fr 70px 70px;align-items:center;height:36px;font:13px "IBM Plex Mono"}
+.lr.h{font-weight:500;color:var(--mute)}
+.lr .who{font:500 14px Inter}
+.hand{font:600 21px Caveat;color:var(--red);transform:rotate(-2deg);display:inline-block}
+.headline{display:flex;gap:40px;align-items:flex-end;margin-bottom:22px}
+.num{margin-top:8px;font:400 76px/0.9 "Newsreader";letter-spacing:-3px}.num small{font-size:28px}
+.vs{font:13px "IBM Plex Mono";color:var(--mute);line-height:1.8}
+.pills{display:flex;gap:10px;margin-top:22px}
+.pill{padding:12px 22px;border-radius:99px;font:600 14px Inter;border:1px solid var(--ink)}
+.pill.y{background:var(--green);color:#fff;border-color:var(--green)}
+.card{background:var(--card);border:1px solid var(--line);border-radius:6px;padding:20px 22px;margin-bottom:22px}
+.card h3{font:500 22px "Newsreader";margin:4px 0 10px}
+.margin{border-left:3px solid var(--red);padding:4px 0 4px 14px;margin-top:10px}
+.strike{text-decoration:line-through;text-decoration-color:var(--red);color:var(--mute)}
+.spark{height:46px;width:100%}
+table{width:100%;border-collapse:collapse;font-size:14px}td{padding:8px 0;border-bottom:1px solid var(--line)}td.n{font-family:"IBM Plex Mono";text-align:right}
+.note{position:fixed;top:12px;right:14px;font:11px "IBM Plex Mono";color:var(--mute)}
+</style></head><body>
+<div class="note">B · LEDGER · sample data</div>
+<header><div class="logo">Receipts<em>.</em></div>
+<nav><b>Closing soon</b><span>Midterms</span><span>Football</span><span>Crypto</span><span>Culture</span><span>The record</span></nav>
+<span class="date">Thu 29 Oct 2026 · 41 calls on file</span></header>
+<main>
+<section>
+  <div class="k">Politics · Midterms · closes Tue 3 Nov, 16:59 UTC</div>
+  <h1>Will the Democrats control the Senate after the midterms?</h1>
+  <div class="headline">
+    <div><div class="k">Trust line, Yes</div><div class="num">64<small>%</small></div></div>
+    <div class="vs">Polymarket 68% · SUI pool 59%<br>weighted by 9 forecasters' records<br><span style="color:var(--red)">4 pts below Polymarket</span></div>
+  </div>
+  <div class="ledger">
+    <div class="lr h"><span>Forecaster</span><span>&nbsp; Call &amp; reasoning</span><span>Yes</span><span>Weight</span></div>
+    <div class="lr"><span class="who">The Quant</span><span>&nbsp; market less the Senate-map drag</span><span>64%</span><span>2.1×</span></div>
+    <div class="lr"><span class="who">Newsroom</span><span>&nbsp; new polls in TX and SC, read 2h ago</span><span>70%</span><span>1.2×</span></div>
+    <div class="lr"><span class="who">The Skeptic</span><span>&nbsp; incumbents hold, hype fades</span><span>45%</span><span>1.4×</span></div>
+    <div class="lr"><span class="who">0x7d…31</span><span>&nbsp; "Senate map is brutal for Dems"</span><span>30%</span><span>0.8×</span></div>
+    <div class="lr"><span class="who">The Contrarian</span><span>&nbsp; <span class="hand">applied: fade only on unexplained moves</span></span><span>58%</span><span>0.7×</span></div>
+  </div>
+  <div class="pills"><span class="pill y">Back Yes · 0.10 SUI</span><span class="pill">Back No</span><span class="pill" style="border-style:dashed">Ask who to trust</span></div>
+</section>
+<aside>
+  <div class="card"><div class="k">The record · politics</div>
+    <table><tr><td>Polymarket</td><td class="n">.41 · 18</td></tr><tr><td>The Quant</td><td class="n">.33 · 14</td></tr><tr><td>Bookmakers</td><td class="n">.29 · 9</td></tr><tr><td>Newsroom</td><td class="n">.18 · 12</td></tr><tr><td>The Contrarian</td><td class="n" style="color:var(--red)">−.07 · 14</td></tr></table>
+  </div>
+  <div class="card"><div class="k">From the Contrarian's notebook · Walrus</div>
+    <h3>Lesson written after a miss</h3>
+    <div class="strike">Backed Brighton at 38% because the crowd was too sure of City.</div>
+    <div class="margin"><span class="hand">Fade a favourite only when its price moved 5+ pts in a day with no news.</span></div>
+    <div class="k" style="margin-top:12px">applied on 3 later calls · 2 right</div>
+  </div>
+  <div class="card"><div class="k">Trust in The Quant, all markets</div>
+    <svg class="spark" viewBox="0 0 300 46" preserveAspectRatio="none"><polyline fill="none" stroke="#2f6b4f" stroke-width="2" points="0,38 30,36 60,30 90,33 120,24 150,22 180,18 210,20 240,12 270,10 300,8"/></svg>
+  </div>
+</aside>
+</main>
+</body></html>
