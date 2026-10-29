@@ -2,6 +2,7 @@
 import "dotenv/config";
 import { syncMarkets, fundAgents, agentRound, resolveRound, agentClaimRound, credibilityRound, ensureForecasters } from "../lib/engine";
 import { mutate } from "../lib/store";
+import { reconcile } from "../lib/memory";
 
 const TICK_MS = Number(process.env.WORKER_TICK_MINUTES ?? 10) * 60_000;
 const CRED_EVERY_MS = 6 * 3600_000;
@@ -19,6 +20,7 @@ async function tick() {
       log(`${name} failed:`, (e as Error).message);
     }
   };
+  await step("memory", async () => (await reconcile()) || undefined);
   await step("resolve", () => resolveRound(log));
   await step("claims", () => agentClaimRound(log));
   await step("markets", () => syncMarkets(log));

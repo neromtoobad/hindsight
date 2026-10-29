@@ -51,6 +51,30 @@ export async function remember(namespace: string, text: string, idempotencyKey?:
   }
 }
 
+/**
+ * Settles writes still marked "queued" (e.g. the process restarted before the job finished)
+ * by asking the relayer for each job's status.
+ */
+export async function reconcile(olderThanMs = 120_000) {
+  if (!env.memoryEnabled()) return 0;
+  const { load } = await import("./store");
+  const stale = load().memory.filter((m) => m.status === "queued" && m.jobId && Date.now() - m.at > olderThanMs);
+  let fixed = 0;
+  for (const m of stale.slice(0, 50)) {
+    try {
+      const s = await mw().getRememberStatus(m.jobId!);
+      if (s.status === "done" || s.status === "uploaded") {
+        await patch(m.jobId!, { status: "stored", blobId: s.blob_id });
+        fixed++;
+      } else if (s.status === "failed" || s.status === "not_found") {
+        await patch(m.jobId!, { status: "failed", error: s.error ?? s.status });
+        fixed++;
+      }
+    } catch {}
+  }
+  return fixed;
+}
+
 export async function recall(namespace: string, query: string, limit = 6, sort?: "recent") {
   if (!env.memoryEnabled()) return [];
   try {
