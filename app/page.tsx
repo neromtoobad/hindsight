@@ -1,142 +1,124 @@
 "use client";
-import { useCallback, useEffect, useMemo, useState } from "react";
-import { useCurrentAccount } from "@mysten/dapp-kit-react";
-import type { MemoryWrite } from "@/lib/types";
+import { useMemo, useState } from "react";
 import { Header } from "@/components/Header";
-import { Board, type Selection } from "@/components/Board";
 import { SlipPanel } from "@/components/BetSlip";
+import { MarketCard, closes, defaultYou, leagueName, odds } from "@/components/MarketCard";
+import { Stage } from "@/components/Line";
 import { Race } from "@/components/Race";
 import { MemoryFeed } from "@/components/Memory";
 import { Ask } from "@/components/Ask";
-import { X402Panel, type X402Feed } from "@/components/X402";
-import { CATS, api, type Card, type PickV, type Row } from "@/components/meta";
+import { X402Panel } from "@/components/X402";
+import { useBook } from "@/components/useBook";
+import { AGENTS, CATS, catColor, catIcon, pct, sourceOf, type Card } from "@/components/meta";
 
-type State = {
-  stats: { markets: number; open: number; resolved: number; picks: number; stakedMist: string; memories: number };
-  open: Card[];
-  awaiting: Card[];
-  settled: Card[];
-  leaderboard: Row[];
-  x402?: X402Feed;
-};
+const ORDER = ["football", "politics", "sports", "crypto", "culture", "other"];
+
+/** The market worth opening on: where Hindsight disagrees most with the public price, else the busiest. */
+function featured(cards: Card[]) {
+  const score = (c: Card) => (c.flag ? c.flag.gap * 10 : 0) + c.stands.filter((s) => AGENTS[s.id]).length + (c.closesAt - Date.now() < 24 * 3600_000 ? 1 : 0);
+  return [...cards].sort((a, b) => score(b) - score(a))[0];
+}
 
 export default function Home() {
-  const account = useCurrentAccount();
-  const [state, setState] = useState<State | null>(null);
-  const [memory, setMemory] = useState<MemoryWrite[]>([]);
-  const [bets, setBets] = useState<PickV[]>([]);
+  const b = useBook();
   const [cat, setCat] = useState("all");
-  const [selection, setSelection] = useState<Selection | null>(null);
-  const [tab, setTab] = useState<"slip" | "bets">("slip");
-  const [sheet, setSheet] = useState(false);
-  const [toastMsg, setToast] = useState<string | null>(null);
-
-  const load = useCallback(() => {
-    api<State>("/api/state").then(setState).catch(() => {});
-    api<MemoryWrite[]>("/api/memory").then(setMemory).catch(() => {});
-  }, []);
-  const loadBets = useCallback(() => {
-    if (!account) return setBets([]);
-    api<{ picks: PickV[] }>(`/api/forecasters/${account.address}`)
-      .then((p) => setBets(p.picks))
-      .catch(() => setBets([]));
-  }, [account]);
-
-  useEffect(() => {
-    load();
-    const t = setInterval(load, 15_000);
-    return () => clearInterval(t);
-  }, [load]);
-  useEffect(() => {
-    loadBets();
-    const t = setInterval(loadBets, 30_000);
-    return () => clearInterval(t);
-  }, [loadBets]);
-
-  const toast = (s: string) => {
-    setToast(s);
-    setTimeout(() => setToast(null), 6000);
-  };
-
+  const open = b.state?.open ?? [];
   const counts = useMemo(() => {
-    const c: Record<string, number> = { all: state?.open.length ?? 0 };
-    for (const m of state?.open ?? []) c[m.category] = (c[m.category] ?? 0) + 1;
+    const c: Record<string, number> = { all: open.length };
+    for (const m of open) c[m.category] = (c[m.category] ?? 0) + 1;
     return c;
-  }, [state]);
-  const cards = (state?.open ?? []).filter((m) => cat === "all" || m.category === cat);
-  const mine = useMemo(() => {
-    const m = new Map<string, number[]>();
-    for (const b of bets) if (b.outcome !== undefined) m.set(b.marketKey, [...(m.get(b.marketKey) ?? []), b.outcome]);
-    return m;
-  }, [bets]);
-  const openBets = bets.filter((b) => b.status === "open").length;
-
-  const showBets = () => {
-    setTab("bets");
-    setSheet(true);
-    document.getElementById("slip")?.scrollIntoView({ block: "start" });
-  };
+  }, [open]);
+  const hero = featured(open);
+  const pool = open.filter((m) => m.key !== hero?.key && (cat === "all" || m.category === cat));
+  const soon = cat === "all" ? pool.filter((m) => m.closesAt - Date.now() < 24 * 3600_000) : [];
+  const rest = pool.filter((m) => !soon.includes(m));
+  const sections: [string, Card[]][] = [
+    ...(soon.length ? [["🔥 Closing in the next 24 hours", soon] as [string, Card[]]] : []),
+    ...ORDER.map((c) => [`${catIcon(c)} ${CATS.find((x) => x.id === c)?.label ?? c}`, rest.filter((m) => m.category === c)] as [string, Card[]]).filter(([, l]) => l.length),
+  ];
+  const sel = b.selection;
 
   return (
     <>
-      <Header cat={cat} setCat={setCat} counts={counts} myBets={account ? openBets : undefined} onMyBets={showBets} />
-      <main className="book">
-        <nav className="sidenav">
-          <span className="k" style={{ padding: "0 12px" }}>Markets</span>
-          {CATS.filter((c) => c.id === "all" || counts[c.id]).map((c) => (
-            <button key={c.id} className={cat === c.id ? "on" : ""} onClick={() => setCat(c.id)}>
-              <span>
-                {c.icon}&nbsp;&nbsp;{c.id === "all" ? "All markets" : c.label}
-              </span>
-              <span className="n">{counts[c.id] ?? 0}</span>
-            </button>
-          ))}
-          {state && (
-            <div className="sidestats k">
-              <span>{state.stats.resolved} settled</span>
-              <span>{state.stats.picks} bets placed</span>
-              <span>{(Number(state.stats.stakedMist) / 1e9).toFixed(2)} SUI staked</span>
-              <span>{state.stats.memories} memories on Walrus</span>
+      <Header myBets={b.account ? b.openBets : undefined} onMyBets={() => { b.setTab("bets"); b.setSheet(true); document.getElementById("slip")?.scrollIntoView({ block: "start" }); }} />
+      <main className="book2">
+        <section className="mainc">
+          {hero && (
+            <div className="hero2" style={{ ["--c" as string]: catColor(hero.category) }}>
+              <div className="herotext">
+                <span className="league">
+                  {catIcon(hero.category)} {leagueName(hero.league)} · closes in {closes(hero.closesAt)}
+                </span>
+                <h1>{hero.question}</h1>
+                <p className="herosub">
+                  {hero.flag ? (
+                    <>
+                      The agents put <b>{hero.outcomes[hero.flag.outcome]}</b> at <b>{pct(hero.trust[hero.flag.outcome])}</b>.{" "}
+                      {sourceOf(hero.flag.source)?.name ?? hero.flag.source} says {pct(hero.ref[hero.flag.source][hero.flag.outcome])}. Who&apos;s right?
+                    </>
+                  ) : (
+                    <>Everyone who called it is standing on the line. Bigger means more trusted. Drag yourself on.</>
+                  )}
+                </p>
+                <div className="odds hero" style={{ gridTemplateColumns: `repeat(${hero.outcomes.length}, minmax(0, 1fr))` }}>
+                  {hero.outcomes.map((o, j) => (
+                    <button key={o} className={`oddbtn ${sel?.card.key === hero.key && sel.you.outcome === j ? "on" : ""}`} onClick={() => b.pick(hero, defaultYou(hero, j))}>
+                      <span>{hero.outcomes.length === 3 && j === 1 ? "Draw" : o}</span>
+                      <b>{odds(hero.trust[j])}</b>
+                    </button>
+                  ))}
+                </div>
+                <a className="k" href={`/m/${encodeURIComponent(hero.key)}`} style={{ textDecoration: "underline" }}>
+                  read every call →
+                </a>
+              </div>
+              <div className="herostage">
+                <Stage card={hero} big you={sel?.card.key === hero.key ? sel.you : null} onYou={(y) => b.pick(hero, y)} />
+              </div>
             </div>
           )}
-        </nav>
 
-        <section style={{ minWidth: 0 }}>
-          {state ? (
-            <Board
-              cards={cards}
-              mine={mine}
-              selected={selection}
-              onSelect={(s) => {
-                setSelection(s);
-                setTab("slip");
-                setSheet(true);
-              }}
-            />
-          ) : (
-            <div className="empty">Loading markets…</div>
-          )}
+          <nav className="catrail">
+            {CATS.filter((c) => c.id === "all" || counts[c.id]).map((c) => (
+              <button key={c.id} className={`chip ${cat === c.id ? "on" : ""}`} onClick={() => setCat(c.id)}>
+                {c.icon}&nbsp;{c.id === "all" ? "Everything" : c.label}
+                <span className="n">{counts[c.id] ?? 0}</span>
+              </button>
+            ))}
+          </nav>
+
+          {!b.state && <div className="empty">Loading markets…</div>}
+          {sections.map(([title, list]) => (
+            <section key={title} className="msec">
+              <h2>{title}</h2>
+              <div className="mgrid">
+                {list.map((c) => (
+                  <MarketCard key={c.key} card={c} held={b.held.get(c.key)} selected={sel?.card.key === c.key ? sel.you.outcome : null} onPick={(y) => b.pick(c, y)} />
+                ))}
+              </div>
+            </section>
+          ))}
         </section>
 
-        <aside className={`side right ${sheet ? "sheet" : ""}`}>
-          <button className="sheetclose" onClick={() => setSheet(false)}>
+        <aside className={`side right ${b.sheet ? "sheet" : ""}`}>
+          <button className="sheetclose" onClick={() => b.setSheet(false)}>
             ✕ Close
           </button>
-          <SlipPanel tab={tab} setTab={setTab} selection={selection} clear={() => setSelection(null)} bets={bets} reloadBets={() => { loadBets(); load(); }} toast={toast} />
-          <Race rows={state?.leaderboard ?? []} you={account?.address} />
-          <X402Panel feed={state?.x402} />
+          <SlipPanel tab={b.tab} setTab={b.setTab} selection={sel} setYou={b.setYou} clear={() => b.setSelection(null)} bets={b.bets} reloadBets={b.reload} toast={b.toast} />
+          <Race rows={b.state?.leaderboard ?? []} you={b.account?.address} />
+          <X402Panel feed={b.state?.x402} />
           <Ask />
-          <MemoryFeed items={memory} stored={state?.stats.memories ?? 0} />
+          <MemoryFeed items={b.memory} stored={b.state?.stats.memories ?? 0} />
         </aside>
       </main>
 
-      {!sheet && (selection || openBets > 0) && (
-        <button className="slipbar" onClick={() => setSheet(true)}>
-          <span>{selection ? `Bet slip · ${selection.card.outcomes[selection.outcome]}` : `My bets · ${openBets} open`}</span>
-          <b>{selection ? "Place bet →" : "View →"}</b>
+      {!b.sheet && (sel || b.openBets > 0) && (
+        <button className="slipbar" onClick={() => b.setSheet(true)}>
+          <span>{sel ? `${sel.card.outcomes[sel.you.outcome]} · ${pct(sel.you.conf)} sure` : `My bets · ${b.openBets} open`}</span>
+          <b>{sel ? "Bet slip →" : "View →"}</b>
         </button>
       )}
-      {toastMsg && <div className="toast">{toastMsg}</div>}
+      {b.toastMsg && <div className="toast">{b.toastMsg}</div>}
     </>
   );
 }

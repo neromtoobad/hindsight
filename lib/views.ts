@@ -24,6 +24,16 @@ export function marketCard(db: Db, m: MarketRec) {
     poolMist: m.pools,
     picks: picks.filter((p) => p.forecaster.startsWith("source:") === false).length,
     flag: d.gap >= 0.08 ? { source: d.source, gap: d.gap, outcome: d.outcome } : null,
+    // Who stands where on this market: latest call per forecaster with its trust weight.
+    stands: l.contributors.slice(0, 14).map((c) => ({
+      id: c.forecaster,
+      name: db.forecasters[c.forecaster]?.name ?? c.forecaster,
+      kind: db.forecasters[c.forecaster]?.kind ?? "human",
+      w: +c.w.toFixed(2),
+      probs: c.probs.map((x) => +x.toFixed(3)),
+      reasoning: picks.filter((p) => p.forecaster === c.forecaster).sort((a, b) => b.placedAt - a.placedAt)[0]?.reasoning ?? null,
+      lesson: picks.filter((p) => p.forecaster === c.forecaster).sort((a, b) => b.placedAt - a.placedAt)[0]?.lessonsUsed?.[0] ?? null,
+    })),
   };
 }
 
