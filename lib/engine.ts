@@ -85,6 +85,7 @@ export async function syncMarkets(log = console.log) {
         upsertSourcePicks(d, d.markets[m.key]);
       });
       log(`opened ${m.key} ${m.question} -> ${marketId}`);
+      await new Promise((r) => setTimeout(r, 800)); // stay under Tatum's burst limit
     } catch (e) {
       log(`create ${m.key}: ${(e as Error).message}`);
     }
@@ -96,11 +97,17 @@ export async function syncMarkets(log = console.log) {
 export async function fundAgents(log = console.log) {
   const wallets = agentWallets();
   const r = chain.resolver();
-  const floor = 150_000_000n; // 0.15 SUI
+  const floor = BigInt(process.env.AGENT_FLOOR_MIST ?? "150000000"); // 0.15 SUI
   const topUp = BigInt(process.env.AGENT_TOPUP_MIST ?? "600000000"); // 0.6 SUI
+  // Keep enough on the resolver to open and settle markets.
+  const reserve = BigInt(process.env.RESOLVER_RESERVE_MIST ?? "250000000"); // 0.25 SUI
   for (const [slug, w] of Object.entries(wallets)) {
     const bal = await chain.balanceOf(w.address);
     if (bal < floor) {
+      if ((await chain.balanceOf(r.toSuiAddress())) < topUp + reserve) {
+        log(`resolver too low to fund ${slug}; skipping`);
+        continue;
+      }
       const d = await chain.sendSui(r, w.address, topUp);
       log(`funded ${slug} ${chain.fmtSui(topUp)} SUI (${d})`);
     }
@@ -116,9 +123,19 @@ export async function agentRound(maxPicks = Number(process.env.AGENT_PICKS_PER_R
     .filter((m) => m.status === "open" && m.onchainId && m.closesAt > now + 10 * 60_000 && m.closesAt - now < AGENT_WINDOW_MS)
     .sort((a, b) => a.closesAt - b.closesAt);
 
+  // Check wallets before spending model calls: a pick needs the stake plus gas.
+  const need = env.agentStakeMist + 6_000_000n;
+  const broke = new Set<string>();
+  for (const p of PERSONAS) {
+    const bal = await chain.balanceOf(wallets[p.slug].address).catch(() => 0n);
+    if (bal < need) broke.add(p.slug);
+  }
+  if (broke.size) log(`agents without gas: ${[...broke].join(", ")}`);
+
   for (const m of due) {
     for (const p of PERSONAS) {
       if (done >= maxPicks) return done;
+      if (broke.has(p.slug)) continue;
       const id = agentId(p);
       if (load().picks.some((x) => x.marketKey === m.key && x.forecaster === id)) continue;
       try {

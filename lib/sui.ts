@@ -2,7 +2,7 @@
 import { SuiGrpcClient } from "@mysten/sui/grpc";
 import { GrpcTransport } from "@protobuf-ts/grpc-transport";
 import { ChannelCredentials } from "@grpc/grpc-js";
-import { Transaction } from "@mysten/sui/transactions";
+import { Transaction, coinWithBalance } from "@mysten/sui/transactions";
 import { Ed25519Keypair } from "@mysten/sui/keypairs/ed25519";
 import { bcs } from "@mysten/sui/bcs";
 import { env } from "./env";
@@ -60,17 +60,34 @@ export const ResolvedEvent = bcs.struct("Resolved", {
   fee: bcs.u64(),
 });
 
+const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
+
+/** Tatum rate-limits bursts (HTTP 429). A rejected request was never executed, so retrying is safe. */
+export async function tatum<T>(fn: () => Promise<T>, tries = 6): Promise<T> {
+  for (let i = 0; ; i++) {
+    try {
+      return await fn();
+    } catch (e) {
+      const msg = String((e as Error)?.message ?? e);
+      if (i >= tries - 1 || !/429|RESOURCE_EXHAUSTED|rate limit/i.test(msg)) throw e;
+      await sleep(700 * 2 ** i);
+    }
+  }
+}
+
 async function run(tx: Transaction, signer: Ed25519Keypair) {
-  const res = await sui().signAndExecuteTransaction({
-    transaction: tx,
-    signer,
-    include: { effects: true, events: true },
-  });
+  const res = await tatum(() =>
+    sui().signAndExecuteTransaction({
+      transaction: tx,
+      signer,
+      include: { effects: true, events: true },
+    }),
+  );
   if (res.$kind === "FailedTransaction") {
     const t = res.FailedTransaction;
     throw new Error(`tx ${t.digest} failed: ${JSON.stringify(t.status)}`);
   }
-  await sui().waitForTransaction({ digest: res.Transaction.digest });
+  await tatum(() => sui().waitForTransaction({ digest: res.Transaction.digest }));
   return res.Transaction;
 }
 
@@ -147,7 +164,8 @@ export function buildPlaceTx(p: {
 }) {
   const tx = new Transaction();
   tx.setSender(p.sender);
-  const [stake] = tx.splitCoins(tx.gas, [p.stakeMist]);
+  // coinWithBalance draws from coin objects or the address balance, whichever the wallet holds.
+  const stake = tx.add(coinWithBalance({ balance: p.stakeMist }));
   const ticket = tx.moveCall({
     target: target("place"),
     arguments: [
@@ -183,7 +201,7 @@ export function buildClaimTx(p: { marketId: string; ticketId: string; sender: st
 
 /** Read a pick back from chain by digest. This is how browser picks enter the index. */
 export async function readPlaced(digest: string) {
-  const res = await sui().getTransaction({ digest, include: { events: true } });
+  const res = await tatum(() => sui().getTransaction({ digest, include: { events: true } }));
   if (res.$kind !== "Transaction") throw new Error(`tx ${digest} failed`);
   const ev = findEvent(res.Transaction.events, "Placed");
   if (!ev) throw new Error(`tx ${digest} has no Placed event`);
@@ -200,20 +218,19 @@ export const ClaimedEvent = bcs.struct("Claimed", {
 
 /** Ticket ids claimed in a transaction, read back through Tatum. */
 export async function readClaimed(digest: string) {
-  const res = await sui().getTransaction({ digest, include: { events: true } });
+  const res = await tatum(() => sui().getTransaction({ digest, include: { events: true } }));
   if (res.$kind !== "Transaction") return [];
   return (res.Transaction.events ?? []).filter((e) => e.eventType === eventType("Claimed")).map((e) => ClaimedEvent.parse(e.bcs));
 }
 
 export async function balanceOf(address: string) {
-  const b = await sui().getBalance({ owner: address });
+  const b = await tatum(() => sui().getBalance({ owner: address }));
   return BigInt(b.balance.balance);
 }
 
 export async function sendSui(signer: Ed25519Keypair, to: string, mist: bigint) {
   const tx = new Transaction();
-  const [c] = tx.splitCoins(tx.gas, [mist]);
-  tx.transferObjects([c], to);
+  tx.transferObjects([tx.add(coinWithBalance({ balance: mist }))], to);
   return (await run(tx, signer)).digest;
 }
 

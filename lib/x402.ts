@@ -2,7 +2,7 @@
 // treasury in SUI, then retries with X-PAYMENT carrying the transaction digest. We verify the
 // payment through Tatum (balance changes, success, age, single use) and serve the resource.
 import { normalizeSuiAddress } from "@mysten/sui/utils";
-import { sui, resolver } from "./sui";
+import { sui, resolver, tatum } from "./sui";
 import { load, mutate } from "./store";
 
 export const NETWORK = `sui:${process.env.SUI_NETWORK ?? "mainnet"}`;
@@ -59,9 +59,7 @@ export async function verify(header: string | null, req: Requirement): Promise<{
   }
   if (load().paid[digest]) return { ok: false, res: paymentRequired(req, "payment already used") };
 
-  const res = await sui()
-    .getTransaction({ digest, include: { balanceChanges: true, transaction: true } })
-    .catch(() => null);
+  const res = await tatum(() => sui().getTransaction({ digest, include: { balanceChanges: true, transaction: true } })).catch(() => null);
   const t = res?.$kind === "Transaction" ? res.Transaction : null;
   if (!t || !t.status.success) return { ok: false, res: paymentRequired(req, "payment not found or failed") };
   if (t.timestampMs && Date.now() - t.timestampMs > MAX_AGE_MS) return { ok: false, res: paymentRequired(req, "payment too old") };
