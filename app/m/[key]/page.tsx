@@ -5,6 +5,7 @@ import { SlipPanel } from "@/components/BetSlip";
 import { Stage } from "@/components/Line";
 import { Race } from "@/components/Race";
 import { useBook } from "@/components/useBook";
+import { AgentDock } from "@/components/AgentDock";
 import { closes, defaultYou, leagueName, odds } from "@/components/MarketCard";
 import { AGENTS, SOURCES, avatar, catColor, catIcon, pct, sui } from "@/components/meta";
 
@@ -130,6 +131,7 @@ export default function MarketPage({ params }: { params: Promise<{ key: string }
           <b>Bet slip →</b>
         </button>
       )}
+      <AgentDock marketKey={card?.key} marketTitle={card?.question} />
       {b.toastMsg && <div className="toast">{b.toastMsg}</div>}
     </>
   );

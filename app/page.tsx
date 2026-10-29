@@ -9,6 +9,7 @@ import { MemoryFeed } from "@/components/Memory";
 import { Ask } from "@/components/Ask";
 import { X402Panel } from "@/components/X402";
 import { useBook } from "@/components/useBook";
+import { AgentDock } from "@/components/AgentDock";
 import { AGENTS, CATS, catColor, catIcon, pct, sourceOf, type Card } from "@/components/meta";
 
 const ORDER = ["football", "politics", "sports", "crypto", "culture", "other"];
@@ -118,6 +119,7 @@ export default function Home() {
           <b>{sel ? "Bet slip →" : "View →"}</b>
         </button>
       )}
+      <AgentDock marketKey={(sel?.card ?? hero)?.key} marketTitle={(sel?.card ?? hero)?.question} />
       {b.toastMsg && <div className="toast">{b.toastMsg}</div>}
     </>
   );
