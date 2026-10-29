@@ -10,6 +10,7 @@ import { Ask } from "@/components/Ask";
 import { X402Panel } from "@/components/X402";
 import { useBook } from "@/components/useBook";
 import { AgentDock } from "@/components/AgentDock";
+import { MarketArt, OutcomeLogo } from "@/components/Art";
 import { AGENTS, CATS, catColor, catIcon, pct, sourceOf, type Card } from "@/components/meta";
 
 const ORDER = ["football", "politics", "sports", "crypto", "culture", "other"];
@@ -50,7 +51,10 @@ export default function Home() {
                 <span className="league">
                   {catIcon(hero.category)} {leagueName(hero.league)} · closes in {closes(hero.closesAt)}
                 </span>
-                <h1>{hero.question}</h1>
+                <div className="titlerow">
+                  <MarketArt card={hero} size={64} />
+                  <h1>{hero.question}</h1>
+                </div>
                 <p className="herosub">
                   {hero.flag ? (
                     <>
@@ -64,7 +68,10 @@ export default function Home() {
                 <div className="odds hero" style={{ gridTemplateColumns: `repeat(${hero.outcomes.length}, minmax(0, 1fr))` }}>
                   {hero.outcomes.map((o, j) => (
                     <button key={o} className={`oddbtn ${sel?.card.key === hero.key && sel.you.outcome === j ? "on" : ""}`} onClick={() => b.pick(hero, defaultYou(hero, j))}>
-                      <span>{hero.outcomes.length === 3 && j === 1 ? "Draw" : o}</span>
+                      <span>
+                        <OutcomeLogo card={hero} j={j} size={22} />
+                        {hero.outcomes.length === 3 && j === 1 ? "Draw" : o}
+                      </span>
                       <b>{odds(hero.trust[j])}</b>
                     </button>
                   ))}
