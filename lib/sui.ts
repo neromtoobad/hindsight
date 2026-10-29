@@ -1,5 +1,7 @@
 // Every Sui read and write goes through Tatum's gateway (gRPC, x-api-key).
 import { SuiGrpcClient } from "@mysten/sui/grpc";
+import { GrpcTransport } from "@protobuf-ts/grpc-transport";
+import { ChannelCredentials } from "@grpc/grpc-js";
 import { Transaction } from "@mysten/sui/transactions";
 import { Ed25519Keypair } from "@mysten/sui/keypairs/ed25519";
 import { bcs } from "@mysten/sui/bcs";
@@ -7,12 +9,17 @@ import { env } from "./env";
 
 let _client: SuiGrpcClient | null = null;
 
+// Tatum serves native gRPC (application/grpc), not gRPC-web, so we bring an HTTP/2 transport.
 export function sui(): SuiGrpcClient {
   if (!_client) {
+    const host = env.grpcUrl.replace(/^https?:\/\//, "").replace(/\/$/, "");
     _client = new SuiGrpcClient({
       network: env.network,
-      baseUrl: env.grpcUrl,
-      meta: { "x-api-key": env.tatumKey() },
+      transport: new GrpcTransport({
+        host: host.includes(":") ? host : `${host}:443`,
+        channelCredentials: ChannelCredentials.createSsl(),
+        meta: { "x-api-key": env.tatumKey() },
+      }),
     });
   }
   return _client;
