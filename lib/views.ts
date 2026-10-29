@@ -57,16 +57,24 @@ export function pickView(db: Db, p: PickRec, m?: MarketRec) {
     ticketId: p.ticketId,
     brier: p.brier,
     correct: p.correct,
+    claimed: Boolean(p.claimed),
+    status: mm?.status,
+    winner: mm?.winner,
     weight: mm ? weight(db, p.forecaster, mm).w : 1,
   };
 }
 
 export function leaderboard(db: Db, scope = "all") {
+  // The race shows movement: weight now against the newest snapshot at least ~20h old.
+  const cutoff = Date.now() - 20 * 3600_000;
+  const prev = [...db.snapshots].reverse().find((s) => s.at <= cutoff) ?? db.snapshots[0];
   return Object.values(db.forecasters)
     .map((f) => {
       const s = skill(db, f.id, scope);
       const picks = db.picks.filter((p) => p.forecaster === f.id);
-      return { id: f.id, name: f.name, kind: f.kind, blurb: f.blurb, ...s, picks: picks.length, open: picks.filter((p) => p.brier === undefined).length };
+      const w = Math.exp(4 * s.skill * (s.n / (s.n + 4)));
+      const wPrev = prev?.weights[f.id]?.[scope] ?? 1;
+      return { id: f.id, name: f.name, kind: f.kind, blurb: f.blurb, ...s, w, trend: w - wPrev, picks: picks.length, open: picks.filter((p) => p.brier === undefined).length };
     })
     .sort((a, b) => b.skill * Math.min(1, b.n / 5) - a.skill * Math.min(1, a.n / 5) || b.picks - a.picks);
 }

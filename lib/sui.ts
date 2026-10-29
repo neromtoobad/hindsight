@@ -191,6 +191,20 @@ export async function readPlaced(digest: string) {
   return { placed, sender: placed.picker, timestampMs: res.Transaction.timestampMs };
 }
 
+export const ClaimedEvent = bcs.struct("Claimed", {
+  market_id: bcs.Address,
+  ticket_id: bcs.Address,
+  picker: bcs.Address,
+  amount: bcs.u64(),
+});
+
+/** Ticket ids claimed in a transaction, read back through Tatum. */
+export async function readClaimed(digest: string) {
+  const res = await sui().getTransaction({ digest, include: { events: true } });
+  if (res.$kind !== "Transaction") return [];
+  return (res.Transaction.events ?? []).filter((e) => e.eventType === eventType("Claimed")).map((e) => ClaimedEvent.parse(e.bcs));
+}
+
 export async function balanceOf(address: string) {
   const b = await sui().getBalance({ owner: address });
   return BigInt(b.balance.balance);
