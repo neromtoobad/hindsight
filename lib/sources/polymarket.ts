@@ -14,12 +14,16 @@ interface GammaMarket {
   volumeNum?: number;
   umaResolutionStatus?: string;
   slug: string;
+  icon?: string;
+  image?: string;
 }
 interface GammaEvent {
   id: string;
   title: string;
   slug: string;
   endDate: string;
+  image?: string;
+  icon?: string;
   tags?: { slug: string }[];
   markets?: GammaMarket[];
 }
@@ -92,6 +96,7 @@ export async function discover(now = Date.now(), horizonDays = 8): Promise<Marke
       status: "draft",
       pools: best.outcomes.map(() => "0"),
       url: `https://polymarket.com/event/${ev.slug}`,
+      icon: best.m.icon ?? best.m.image ?? ev.icon ?? ev.image,
     });
   }
   return out;
@@ -112,4 +117,10 @@ export async function result(id: string): Promise<number | "void" | null> {
   if (w >= 0) return w;
   if (p.length === 2 && p.every((x) => Math.abs(x - 0.5) < 0.01)) return "void";
   return null;
+}
+
+/** The market's official image (backfill). */
+export async function art(id: string): Promise<string | null> {
+  const m = await get<GammaMarket>(`/markets/${id}`);
+  return m.icon ?? m.image ?? null;
 }

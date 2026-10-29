@@ -1,4 +1,5 @@
 "use client";
+import { Help } from "./Help";
 import { useState } from "react";
 import { useCurrentAccount, useDAppKit } from "@mysten/dapp-kit-react";
 import { Transaction } from "@mysten/sui/transactions";
@@ -137,7 +138,7 @@ function Slip({ selection, setYou, clear, toast, onPlaced }: { selection: Select
       <div className="stance">
         <span className="k">You&apos;re backing</span>
         <b>{pickName}</b>
-        <span className="mono">{pct(you.conf)} sure · odds {odds(card.trust[you.outcome])}</span>
+        <span className="mono">{pct(you.conf)} sure <Help to="scoring" /> · odds {odds(card.trust[you.outcome])} <Help to="odds" /></span>
       </div>
 
       {tails.length > 0 && (
@@ -162,7 +163,7 @@ function Slip({ selection, setYou, clear, toast, onPlaced }: { selection: Select
           <span>SUI</span>
         </div>
         <div className="towin">
-          <span className="k">To win now</span>
+          <span className="k">To win now <Help to="pool" /></span>
           <b>{valid ? toWin.toFixed(3) : "—"}</b>
         </div>
       </div>
@@ -256,7 +257,7 @@ function Receipts({ bets, reload, toast }: { bets: PickV[]; reload: () => void; 
             </div>
             {b.brier !== undefined && (
               <div className="rline">
-                <span>Score (Brier)</span>
+                <span>Score (Brier) <Help to="scoring" /></span>
                 <b className="mono">{b.brier.toFixed(2)}</b>
               </div>
             )}

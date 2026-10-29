@@ -1,6 +1,7 @@
 "use client";
 import { catColor, catIcon, pct, sourceOf, sui, type Card } from "./meta";
 import { Stage, type You } from "./Line";
+import { MarketArt, OutcomeLogo } from "./Art";
 
 export const LEAGUES: Record<string, string> = {
   "eng.1": "Premier League",
@@ -60,8 +61,9 @@ export function MarketCard({
         </span>
         <span className={`clock2 ${soon ? "hot" : ""}`}>⏱ {closes(card.closesAt)}</span>
       </div>
-      <a className="mq" href={`/m/${encodeURIComponent(card.key)}`}>
-        {card.question}
+      <a className="mhead" href={`/m/${encodeURIComponent(card.key)}`}>
+        <MarketArt card={card} size={46} />
+        <span className="mq">{card.question}</span>
       </a>
       {card.flag && (
         <div className="flag2">
@@ -72,7 +74,10 @@ export function MarketCard({
       <div className="odds" style={{ gridTemplateColumns: `repeat(${card.outcomes.length}, minmax(0, 1fr))` }}>
         {card.outcomes.map((o, j) => (
           <button key={o} className={`oddbtn ${selected === j ? "on" : ""} ${held?.includes(j) ? "held" : ""}`} onClick={() => onPick(defaultYou(card, j))}>
-            <span>{card.outcomes.length === 3 && j === 1 ? "Draw" : o}</span>
+            <span>
+              <OutcomeLogo card={card} j={j} />
+              {card.outcomes.length === 3 && j === 1 ? "Draw" : o}
+            </span>
             <b>{odds(card.trust[j])}</b>
           </button>
         ))}

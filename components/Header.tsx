@@ -52,6 +52,11 @@ export function Header({
         <Mark size={46} />
         hindsight
       </a>
+      <nav className="mainnav">
+        <a href="/markets">Markets</a>
+        <a href="/#panel">Agents</a>
+        <a href="/guide">Guide</a>
+      </nav>
       {setCat && (
         <nav className="chips mobile-only">
           {CATS.filter((c) => c.id === "all" || counts?.[c.id]).map((c) => (
@@ -69,7 +74,7 @@ export function Header({
             My bets{myBets ? <span className="badge">{myBets}</span> : null}
           </button>
         ) : (
-          <a className="mybets" href="/#slip">
+          <a className="mybets" href="/markets#slip">
             My bets
           </a>
         )}

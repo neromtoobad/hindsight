@@ -1,4 +1,5 @@
 "use client";
+import { Help } from "./Help";
 import { avatar, type Row } from "./meta";
 
 export function Race({ rows, you }: { rows: Row[]; you?: string }) {
@@ -13,7 +14,7 @@ export function Race({ rows, you }: { rows: Row[]; you?: string }) {
   return (
     <div className="panel">
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline" }}>
-        <span className="k">🏁 The race · all markets</span>
+        <span className="k">🏁 The race · all markets <Help to="scoring" /></span>
         <span className="k">{scored ? `${scored} calls scored · skill →` : "starts at the first result"}</span>
       </div>
       <div style={{ marginTop: 8 }}>

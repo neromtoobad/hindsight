@@ -47,6 +47,7 @@ export async function discover(now = Date.now(), days = 5): Promise<MarketRec[]>
         const kickoff = Date.parse(e.date);
         if (kickoff < now + 3 * 3600_000) continue;
         const book = bookProbs(c.odds?.[0]);
+        const hex = (t: any) => (t?.color ? `#${t.color}` : null);
         out.push({
           key: `espn:${e.id}`,
           source: "espn",
@@ -60,6 +61,9 @@ export async function discover(now = Date.now(), days = 5): Promise<MarketRec[]>
           status: "draft",
           pools: ["0", "0", "0"],
           url: `https://www.espn.com/soccer/match/_/gameId/${e.id}`,
+          logos: [home.team.logo ?? null, null, away.team.logo ?? null],
+          colors: [hex(home.team), null, hex(away.team)],
+          leagueLogo: data.leagues?.[0]?.logos?.[0]?.href,
         });
       }
     }
@@ -91,4 +95,19 @@ export async function result(sourceId: string): Promise<number | "void" | null> 
   const h = Number(home.score);
   const a = Number(away.score);
   return h > a ? 0 : h === a ? 1 : 2;
+}
+
+/** Crests and colours for a fixture already on the board (backfill). */
+export async function art(sourceId: string): Promise<{ logos: (string | null)[]; colors: (string | null)[] } | null> {
+  const [league, id] = sourceId.split("/");
+  const r = await fetch(`${BASE}/${league}/summary?event=${id}`);
+  if (!r.ok) return null;
+  const s = (await r.json()) as any;
+  const comps = s.header?.competitions?.[0]?.competitors ?? [];
+  const home = comps.find((x: any) => x.homeAway === "home")?.team;
+  const away = comps.find((x: any) => x.homeAway === "away")?.team;
+  if (!home || !away) return null;
+  const logo = (t: any) => t.logos?.[0]?.href ?? t.logo ?? null;
+  const hex = (t: any) => (t.color ? `#${t.color}` : null);
+  return { logos: [logo(home), null, logo(away)], colors: [hex(home), null, hex(away)] };
 }

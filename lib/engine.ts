@@ -47,6 +47,19 @@ export async function syncMarkets(log = console.log) {
   const db = load();
   const open = Object.values(db.markets).filter((m) => m.status === "open");
 
+  // Backfill official art (crests, market images) on markets opened before we stored it.
+  for (const m of open.filter((m) => !m.icon && !m.logos)) {
+    try {
+      if (m.source === "polymarket") {
+        const icon = await pm.art(m.sourceId);
+        if (icon) await mutate((d) => void (d.markets[m.key].icon = icon));
+      } else {
+        const a = await espn.art(m.sourceId);
+        if (a) await mutate((d) => void Object.assign(d.markets[m.key], a));
+      }
+    } catch {}
+  }
+
   // Refresh public reference prices on open markets until they close.
   for (const m of open.filter((m) => m.closesAt > now)) {
     try {

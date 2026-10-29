@@ -1,126 +1,252 @@
 "use client";
-import { useMemo, useState } from "react";
+import { useRouter } from "next/navigation";
 import { Header } from "@/components/Header";
-import { SlipPanel } from "@/components/BetSlip";
-import { MarketCard, closes, defaultYou, leagueName, odds } from "@/components/MarketCard";
+import { MarketCard, closes, leagueName } from "@/components/MarketCard";
+import { MarketArt } from "@/components/Art";
 import { Stage } from "@/components/Line";
 import { Race } from "@/components/Race";
 import { MemoryFeed } from "@/components/Memory";
-import { Ask } from "@/components/Ask";
 import { X402Panel } from "@/components/X402";
+import { AgentDock, openChat } from "@/components/AgentDock";
+import { Help } from "@/components/Help";
 import { useBook } from "@/components/useBook";
-import { AgentDock } from "@/components/AgentDock";
-import { AGENTS, CATS, catColor, catIcon, pct, sourceOf, type Card } from "@/components/meta";
+import { AGENTS, AGENT_IDS, catColor, catIcon, pct, sourceOf, sui, type Card } from "@/components/meta";
 
-const ORDER = ["football", "politics", "sports", "crypto", "culture", "other"];
+const BLURB: Record<string, string> = {
+  quant: "Anchors on market prices and base rates. Moves only when the numbers say so.",
+  contrarian: "Fades favourites when the crowd looks too sure of itself.",
+  form: "Momentum, recent results, who's in form.",
+  skeptic: "Bets on the status quo and regression to the mean.",
+  newsroom: "Reads the latest news before every call.",
+};
 
-/** The market worth opening on: where Hindsight disagrees most with the public price, else the busiest. */
 function featured(cards: Card[]) {
   const score = (c: Card) => (c.flag ? c.flag.gap * 10 : 0) + c.stands.filter((s) => AGENTS[s.id]).length + (c.closesAt - Date.now() < 24 * 3600_000 ? 1 : 0);
   return [...cards].sort((a, b) => score(b) - score(a))[0];
 }
 
-export default function Home() {
+export default function Landing() {
   const b = useBook();
-  const [cat, setCat] = useState("all");
+  const router = useRouter();
   const open = b.state?.open ?? [];
-  const counts = useMemo(() => {
-    const c: Record<string, number> = { all: open.length };
-    for (const m of open) c[m.category] = (c[m.category] ?? 0) + 1;
-    return c;
-  }, [open]);
   const hero = featured(open);
-  const pool = open.filter((m) => m.key !== hero?.key && (cat === "all" || m.category === cat));
-  const soon = cat === "all" ? pool.filter((m) => m.closesAt - Date.now() < 24 * 3600_000) : [];
-  const rest = pool.filter((m) => !soon.includes(m));
-  const sections: [string, Card[]][] = [
-    ...(soon.length ? [["🔥 Closing in the next 24 hours", soon] as [string, Card[]]] : []),
-    ...ORDER.map((c) => [`${catIcon(c)} ${CATS.find((x) => x.id === c)?.label ?? c}`, rest.filter((m) => m.category === c)] as [string, Card[]]).filter(([, l]) => l.length),
-  ];
-  const sel = b.selection;
+  const soon = [...open].filter((c) => c.key !== hero?.key).sort((x, y) => x.closesAt - y.closesAt).slice(0, 6);
+  const stats = b.state?.stats;
+  const rows = b.state?.leaderboard ?? [];
 
   return (
     <>
-      <Header myBets={b.account ? b.openBets : undefined} onMyBets={() => { b.setTab("bets"); b.setSheet(true); document.getElementById("slip")?.scrollIntoView({ block: "start" }); }} />
-      <main className="book2">
-        <section className="mainc">
-          {hero && (
+      <Header myBets={b.account ? b.openBets : undefined} />
+      <main className="land">
+        {/* 1. What this is */}
+        <section className="lhero">
+          <div className="lcopy">
+            <span className="eyebrow">Prediction market on Sui · memory on Walrus</span>
+            <h1>
+              Call it before it happens.
+              <br />
+              <span className="hl">Hindsight remembers</span> who was right.
+            </h1>
+            <p>
+              Five AI agents, Polymarket, DraftKings and you all stand on the same line for every market: football, politics, crypto, culture. Every call is a ticket on Sui
+              before the event. After the result, Hindsight scores everyone, the agents write down what they learned, and trust moves to whoever keeps being right.
+            </p>
+            <div className="lctas">
+              <a className="placebtn" href="/markets">
+                Browse {open.length || ""} markets →
+              </a>
+              <a className="ghostbtn" href="/guide">
+                New here? Read the guide
+              </a>
+            </div>
+            <div className="lstats">
+              <div><b>{stats?.open ?? "—"}</b><span>open markets</span></div>
+              <div><b>{stats?.picks ?? "—"}</b><span>calls on chain</span></div>
+              <div><b>{stats ? (Number(stats.stakedMist) / 1e9).toFixed(2) : "—"}</b><span>SUI staked</span></div>
+              <div><b>{stats?.memories ?? "—"}</b><span>memories on Walrus</span></div>
+            </div>
+          </div>
+          <div className="lcast">
+            <img src="/agents/lineup.png" alt="The Quant, the Contrarian, Form Guide, the Skeptic and Newsroom" />
+            <div className="castline" />
+            {hero &&
+              hero.stands
+                .filter((s) => AGENTS[s.id])
+                .slice(0, 3)
+                .map((s, i) => {
+                  const top = s.probs.indexOf(Math.max(...s.probs));
+                  return (
+                    <span key={s.id} className={`bubble2 b${i}`}>
+                      <b>{AGENTS[s.id].short}:</b> {hero.outcomes[top].split(" ")[0]} {pct(s.probs[top])}
+                    </span>
+                  );
+                })}
+          </div>
+        </section>
+
+        {/* 2. How it works */}
+        <section className="lsec">
+          <h2>How it works</h2>
+          <div className="steps">
+            <div className="step">
+              <span className="num">1</span>
+              <h3>Stand on the line</h3>
+              <p>Every market is a line between the outcomes. Drag yourself to what you believe. Where you stand is your pick and how sure you are.</p>
+              <a href="/guide#line">How the line works →</a>
+            </div>
+            <div className="step">
+              <span className="num">2</span>
+              <h3>Get your receipt</h3>
+              <p>Your stake mints a ticket on Sui before the event, with your reasoning hashed onto it. Nobody can claim they called it afterwards.</p>
+              <a href="/guide#receipt">What's a ticket? →</a>
+            </div>
+            <div className="step">
+              <span className="num">3</span>
+              <h3>Hindsight remembers</h3>
+              <p>After the result, every call is scored. Agents that missed write a lesson to Walrus and read it before their next pick. Trust follows the record.</p>
+              <a href="/guide#memory">How memory works →</a>
+            </div>
+          </div>
+        </section>
+
+        {/* 3. The live disagreement */}
+        {hero && (
+          <section className="lsec">
+            <h2>
+              Tonight&apos;s big disagreement <Help to="trust-line" />
+            </h2>
             <div className="hero2" style={{ ["--c" as string]: catColor(hero.category) }}>
               <div className="herotext">
                 <span className="league">
                   {catIcon(hero.category)} {leagueName(hero.league)} · closes in {closes(hero.closesAt)}
                 </span>
-                <h1>{hero.question}</h1>
+                <div className="titlerow">
+                  <MarketArt card={hero} size={64} />
+                  <h1 style={{ fontSize: "clamp(24px, 2.6vw, 34px)" }}>{hero.question}</h1>
+                </div>
                 <p className="herosub">
                   {hero.flag ? (
                     <>
-                      The agents put <b>{hero.outcomes[hero.flag.outcome]}</b> at <b>{pct(hero.trust[hero.flag.outcome])}</b>.{" "}
-                      {sourceOf(hero.flag.source)?.name ?? hero.flag.source} says {pct(hero.ref[hero.flag.source][hero.flag.outcome])}. Who&apos;s right?
+                      The agents put <b>{hero.outcomes[hero.flag.outcome]}</b> at <b>{pct(hero.trust[hero.flag.outcome])}</b>. {sourceOf(hero.flag.source)?.name ?? hero.flag.source} says{" "}
+                      {pct(hero.ref[hero.flag.source][hero.flag.outcome])}. Who&apos;s right?
                     </>
                   ) : (
-                    <>Everyone who called it is standing on the line. Bigger means more trusted. Drag yourself on.</>
+                    <>Everyone who called it is standing on the line. Bigger means more trusted.</>
                   )}
                 </p>
-                <div className="odds hero" style={{ gridTemplateColumns: `repeat(${hero.outcomes.length}, minmax(0, 1fr))` }}>
-                  {hero.outcomes.map((o, j) => (
-                    <button key={o} className={`oddbtn ${sel?.card.key === hero.key && sel.you.outcome === j ? "on" : ""}`} onClick={() => b.pick(hero, defaultYou(hero, j))}>
-                      <span>{hero.outcomes.length === 3 && j === 1 ? "Draw" : o}</span>
-                      <b>{odds(hero.trust[j])}</b>
-                    </button>
-                  ))}
-                </div>
-                <a className="k" href={`/m/${encodeURIComponent(hero.key)}`} style={{ textDecoration: "underline" }}>
-                  read every call →
+                <a className="placebtn" style={{ alignSelf: "flex-start", width: "auto", padding: "13px 20px" }} href={`/m/${encodeURIComponent(hero.key)}`}>
+                  Stand on this line →
                 </a>
               </div>
               <div className="herostage">
-                <Stage card={hero} big you={sel?.card.key === hero.key ? sel.you : null} onYou={(y) => b.pick(hero, y)} />
+                <Stage card={hero} big />
               </div>
             </div>
-          )}
+          </section>
+        )}
 
-          <nav className="catrail">
-            {CATS.filter((c) => c.id === "all" || counts[c.id]).map((c) => (
-              <button key={c.id} className={`chip ${cat === c.id ? "on" : ""}`} onClick={() => setCat(c.id)}>
-                {c.icon}&nbsp;{c.id === "all" ? "Everything" : c.label}
-                <span className="n">{counts[c.id] ?? 0}</span>
-              </button>
-            ))}
-          </nav>
-
-          {!b.state && <div className="empty">Loading markets…</div>}
-          {sections.map(([title, list]) => (
-            <section key={title} className="msec">
-              <h2>{title}</h2>
-              <div className="mgrid">
-                {list.map((c) => (
-                  <MarketCard key={c.key} card={c} held={b.held.get(c.key)} selected={sel?.card.key === c.key ? sel.you.outcome : null} onPick={(y) => b.pick(c, y)} />
-                ))}
-              </div>
-            </section>
-          ))}
+        {/* 4. The panel */}
+        <section className="lsec" id="panel">
+          <h2>
+            Meet the panel <Help to="agents" />
+          </h2>
+          <p className="lede">Five house agents call every market in its last 36 hours, with real SUI on the line. Each keeps a notebook of lessons on Walrus. Ask them anything about their calls.</p>
+          <div className="panelgrid">
+            {AGENT_IDS.map((id) => {
+              const a = AGENTS[id];
+              const r = rows.find((x) => x.id === id);
+              const call = open.map((c) => ({ c, s: c.stands.find((s) => s.id === id) })).find((x) => x.s);
+              const top = call?.s ? call.s.probs.indexOf(Math.max(...call.s.probs)) : -1;
+              return (
+                <div className="agentcard" key={id} style={{ background: a.tint }}>
+                  <img src={`/agents/${a.slug}.png`} alt={a.short} />
+                  <h3>{a.slug === "form" || a.slug === "newsroom" ? a.short : `The ${a.short}`}</h3>
+                  <p>{BLURB[a.slug]}</p>
+                  <div className="arec">
+                    <span><b>{r?.n ? r.skill.toFixed(2) : "—"}</b>skill</span>
+                    <span><b>{r?.n ? pct(r.hitRate) : "—"}</b>right</span>
+                    <span><b>{r?.picks ?? 0}</b>calls</span>
+                  </div>
+                  {call?.s && (
+                    <div className="alast">
+                      Latest: <b>{call.c.outcomes[top]} {pct(call.s.probs[top])}</b> on {call.c.question.slice(0, 48)}
+                      {call.c.question.length > 48 ? "…" : ""}
+                    </div>
+                  )}
+                  <div className="abtns">
+                    <button className="lip" onClick={() => openChat(a.slug)}>
+                      Chat
+                    </button>
+                    <a className="ghostbtn sm" href={`/f/${encodeURIComponent(id)}`}>
+                      Record & notebook
+                    </a>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
         </section>
 
-        <aside className={`side right ${b.sheet ? "sheet" : ""}`}>
-          <button className="sheetclose" onClick={() => b.setSheet(false)}>
-            ✕ Close
-          </button>
-          <SlipPanel tab={b.tab} setTab={b.setTab} selection={sel} setYou={b.setYou} clear={() => b.setSelection(null)} bets={b.bets} reloadBets={b.reload} toast={b.toast} />
-          <Race rows={b.state?.leaderboard ?? []} you={b.account?.address} />
-          <X402Panel feed={b.state?.x402} />
-          <Ask />
-          <MemoryFeed items={b.memory} stored={b.state?.stats.memories ?? 0} />
-        </aside>
-      </main>
+        {/* 5. Closing soon */}
+        {soon.length > 0 && (
+          <section className="lsec">
+            <div className="sechead">
+              <h2>Closing soon</h2>
+              <a href="/markets">All {open.length} markets →</a>
+            </div>
+            <div className="mgrid">
+              {soon.map((c) => (
+                <MarketCard key={c.key} card={c} held={b.held.get(c.key)} onPick={() => router.push(`/m/${encodeURIComponent(c.key)}`)} />
+              ))}
+            </div>
+          </section>
+        )}
 
-      {!b.sheet && (sel || b.openBets > 0) && (
-        <button className="slipbar" onClick={() => b.setSheet(true)}>
-          <span>{sel ? `${sel.card.outcomes[sel.you.outcome]} · ${pct(sel.you.conf)} sure` : `My bets · ${b.openBets} open`}</span>
-          <b>{sel ? "Bet slip →" : "View →"}</b>
-        </button>
-      )}
-      <AgentDock marketKey={(sel?.card ?? hero)?.key} marketTitle={(sel?.card ?? hero)?.question} />
-      {b.toastMsg && <div className="toast">{b.toastMsg}</div>}
+        {/* 6. Trust + memory */}
+        <section className="lsec two">
+          <div>
+            <h2>
+              The race <Help to="scoring" />
+            </h2>
+            <p className="lede">Everyone ranked by how well their calls hold up. Agents, the public prices, and players race on the same track.</p>
+            <Race rows={rows} you={b.account?.address} />
+          </div>
+          <div>
+            <h2>
+              What Hindsight remembers <Help to="memory" />
+            </h2>
+            <p className="lede">Every pick, result, lesson and trust table is written to Walrus Memory on mainnet, live.</p>
+            <MemoryFeed items={b.memory} stored={stats?.memories ?? 0} />
+          </div>
+        </section>
+
+        {/* 7. Builders */}
+        <section className="lsec two">
+          <div>
+            <h2>
+              For agents and builders <Help to="x402" />
+            </h2>
+            <p className="lede">Hindsight&apos;s sharp line is a paid API. Any agent can buy it per call with x402, settled in SUI on Sui and verified through Tatum.</p>
+            <X402Panel feed={b.state?.x402} />
+          </div>
+          <div className="stack">
+            <h2>Built on</h2>
+            <div className="builtgrid">
+              <div><b>Sui</b><span>Markets are shared objects; every bet is a Ticket you own. {stats ? `${sui(stats.stakedMist)} SUI staked so far.` : ""}</span></div>
+              <div><b>Walrus Memory</b><span>Picks, scorecards, lessons and trust tables, written as they happen and recalled by the agents.</span></div>
+              <div><b>Tatum</b><span>Every Sui read and write goes through Tatum&apos;s gRPC gateway: publishing, bets, settlement, x402 checks.</span></div>
+            </div>
+          </div>
+        </section>
+
+        <footer className="lfoot">
+          <span>hindsight · call it before it happens</span>
+          <a href="/markets">Markets</a>
+          <a href="/guide">Guide</a>
+          <a href="/#panel">Agents</a>
+        </footer>
+      </main>
+      <AgentDock marketKey={hero?.key} marketTitle={hero?.question} />
     </>
   );
 }

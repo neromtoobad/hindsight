@@ -24,6 +24,11 @@ export interface MarketRec {
   /** Pools in MIST per outcome, from our own picks index. */
   pools: string[];
   url?: string;
+  /** Official art: Polymarket's market image, or ESPN crests/colours per outcome (null for the draw). */
+  icon?: string;
+  logos?: (string | null)[];
+  colors?: (string | null)[];
+  leagueLogo?: string;
 }
 
 export type ForecasterKind = "human" | "agent" | "source";

@@ -1,4 +1,5 @@
 "use client";
+import { Help } from "./Help";
 import { useState } from "react";
 import { avatar, ago, sui } from "./meta";
 
@@ -14,7 +15,7 @@ export function X402Panel({ feed }: { feed?: X402Feed }) {
   return (
     <div className="panel">
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline" }}>
-        <span className="k">x402 · agents paying agents</span>
+        <span className="k">x402 · agents paying agents <Help to="x402" /></span>
         <span className="k">{feed ? `${feed.calls} paid · ${sui(feed.totalMist)} SUI` : ""}</span>
       </div>
       <p style={{ fontSize: 13, margin: "8px 0 10px" }}>

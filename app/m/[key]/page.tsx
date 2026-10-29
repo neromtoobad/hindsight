@@ -6,6 +6,7 @@ import { Stage } from "@/components/Line";
 import { Race } from "@/components/Race";
 import { useBook } from "@/components/useBook";
 import { AgentDock } from "@/components/AgentDock";
+import { MarketArt, OutcomeLogo } from "@/components/Art";
 import { closes, defaultYou, leagueName, odds } from "@/components/MarketCard";
 import { AGENTS, SOURCES, avatar, catColor, catIcon, pct, sui } from "@/components/meta";
 
@@ -33,14 +34,20 @@ export default function MarketPage({ params }: { params: Promise<{ key: string }
                   <span className="league">
                     {catIcon(card.category)} {leagueName(card.league)} · {isOpen ? `closes in ${closes(card.closesAt)}` : card.status === "resolved" ? `settled: ${card.outcomes[card.winner ?? 0]}` : card.status === "void" ? "void, stakes refunded" : "closed, waiting for the result"}
                   </span>
-                  <h1>{card.question}</h1>
+                  <div className="titlerow">
+                    <MarketArt card={card} size={72} />
+                    <h1>{card.question}</h1>
+                  </div>
                 </div>
                 <Stage card={card} big you={sel?.you ?? null} onYou={isOpen ? (y) => b.pick(card, y) : undefined} />
                 {isOpen && (
                   <div className="odds hero" style={{ gridTemplateColumns: `repeat(${card.outcomes.length}, minmax(0, 1fr))` }}>
                     {card.outcomes.map((o, j) => (
                       <button key={o} className={`oddbtn ${sel?.you.outcome === j ? "on" : ""}`} onClick={() => b.pick(card, defaultYou(card, j))}>
-                        <span>{card.outcomes.length === 3 && j === 1 ? "Draw" : o}</span>
+                        <span>
+                          <OutcomeLogo card={card} j={j} size={22} />
+                          {card.outcomes.length === 3 && j === 1 ? "Draw" : o}
+                        </span>
                         <b>{odds(card.trust[j])}</b>
                       </button>
                     ))}

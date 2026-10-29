@@ -28,11 +28,33 @@ function save(slug: string, m: Msg[]) {
 }
 
 /** The house agents float at the edge of the screen. Tap one to talk to it about its calls. */
+/** Open a specific agent's chat from anywhere: openChat("quant"). */
+export const openChat = (slug: string) => window.dispatchEvent(new CustomEvent("hs:chat", { detail: slug }));
+
 export function AgentDock({ marketKey, marketTitle }: { marketKey?: string; marketTitle?: string }) {
   const [open, setOpen] = useState<string | null>(null);
+  const [fan, setFan] = useState(false);
+  useEffect(() => {
+    const h = (e: Event) => setOpen((e as CustomEvent<string>).detail);
+    window.addEventListener("hs:chat", h);
+    return () => window.removeEventListener("hs:chat", h);
+  }, []);
   return (
     <>
-      <div className="dock" aria-label="Chat with the agents">
+      {!fan && (
+        <button className="dockpill" onClick={() => setFan(true)} aria-label="Ask the agents">
+          <span className="faces">
+            {AGENT_IDS.map((id) => (
+              <img key={id} src={`/agents/${AGENTS[id].slug}-head.png`} alt="" style={{ background: AGENTS[id].tint }} />
+            ))}
+          </span>
+          Ask the agents
+        </button>
+      )}
+      <div className={`dock ${fan ? "" : "hidden"}`} aria-label="Chat with the agents">
+        <button className="dockclose" onClick={() => setFan(false)} aria-label="Fold the agents away">
+          ✕
+        </button>
         {AGENT_IDS.map((id, i) => {
           const a = AGENTS[id];
           return (

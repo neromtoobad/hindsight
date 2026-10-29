@@ -1,4 +1,5 @@
 "use client";
+import { Help } from "./Help";
 import { useRef } from "react";
 import { AGENTS, SOURCES, avatar, pct, type Card } from "./meta";
 
@@ -124,7 +125,7 @@ function Track({ card, you, onYou, big, youLabel }: { card: Card; you?: You | nu
       )}
       {big && (
         <div className="legend k">
-          <span><i className="lg pinlg" /> Hindsight trust line</span>
+          <span><i className="lg pinlg" /> Hindsight trust line <Help to="trust-line" /></span>
           {crowd !== undefined && <span><i className="lg coinlg" /> SUI pool</span>}
           <span>bigger = more trusted</span>
         </div>
@@ -171,7 +172,7 @@ function Corners({ card, you, onYou, big, youLabel }: { card: Card; you?: You | 
           const book = card.ref.bookmaker?.[j];
           return (
             <div className={`col ${you?.outcome === j ? "yours" : ""}`} key={o}>
-              <div className="fill" style={{ height: `${card.trust[j] * 100}%` }} />
+              <div className="fill" style={{ height: `${card.trust[j] * 100}%`, ...(card.colors?.[j] ? { ["--c" as string]: card.colors[j]! } : {}) }} />
               <span className="colpct">{pct(card.trust[j])}</span>
               {book !== undefined && big && (
                 <span className="booktick" style={{ bottom: `${book * 100}%` }} title={`DraftKings ${pct(book)}`}>
@@ -194,7 +195,10 @@ function Corners({ card, you, onYou, big, youLabel }: { card: Card; you?: You | 
       </div>
       <div className="colnames" style={{ gridTemplateColumns: `repeat(${k}, 1fr)` }}>
         {card.outcomes.map((o, j) => (
-          <span key={o}>{j === 1 && k === 3 ? "Draw" : o}</span>
+          <span key={o}>
+            {card.logos?.[j] && <img className="olog" src={card.logos[j]!} alt="" />}
+            {j === 1 && k === 3 ? "Draw" : o}
+          </span>
         ))}
       </div>
       {onYou && !you && <span className="youhint">tap a column to stand in it · higher = more sure</span>}
