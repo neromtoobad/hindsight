@@ -1,0 +1,9 @@
+export const metadata = { title: "Receipts", description: "A prediction market that remembers who was right." };
+
+export default function RootLayout({ children }: { children: React.ReactNode }) {
+  return (
+    <html lang="en">
+      <body>{children}</body>
+    </html>
+  );
+}
