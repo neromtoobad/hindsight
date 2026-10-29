@@ -34,7 +34,10 @@ export function Race({ rows, you }: { rows: Row[]; you?: string }) {
                 ) : (
                   <span className="runner" style={{ left: `${x}%`, background: a.color }}>{a.badge}</span>
                 )}
-                <span className={`delta ${r.trend > 0.02 ? "ok" : r.trend < -0.02 ? "bad" : ""}`} style={{ left: `calc(${x}% + 24px)` }}>
+                <span
+                  className={`delta ${r.trend > 0.02 ? "ok" : r.trend < -0.02 ? "bad" : ""}`}
+                  style={x > 66 ? { right: `calc(${100 - x}% + 24px)` } : { left: `calc(${x}% + 24px)` }}
+                >
                   {r.n === 0 ? "warming up" : moved ? `${r.trend > 0 ? "▲" : "▼"}${Math.abs(r.trend).toFixed(1)}` : `${r.n} scored`}
                 </span>
                 <div className="finish" />
