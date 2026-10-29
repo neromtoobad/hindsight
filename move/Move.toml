@@ -1,0 +1,8 @@
+[package]
+name = "receipts"
+edition = "2024"
+
+[dependencies]
+
+[addresses]
+receipts = "0x0"
