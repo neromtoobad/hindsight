@@ -107,7 +107,7 @@ Picks close: ${new Date(m.closesAt).toISOString()} (now ${new Date(ctx.now).toIS
 
 Reference prices:
 ${refs || "none"}
-Current Receipts trust line: ${m.outcomes.map((o, i) => `${o} ${pct(ctx.trust[i])}`).join(", ")}
+Current Hindsight trust line: ${m.outcomes.map((o, i) => `${o} ${pct(ctx.trust[i])}`).join(", ")}
 
 Your notebook (lessons you wrote after past misses):
 ${ctx.lessons.length ? ctx.lessons.map((l) => `- ${l}`).join("\n") : "- (empty)"}
@@ -121,7 +121,7 @@ Give your probabilities, the outcome you back, and why. If a notebook lesson fit
     model: env.agentModel,
     max_tokens: 4000,
     output_config: { effort: p.webSearch ? "medium" : "low", format: zodOutputFormat(PickOut) },
-    system: `You are ${p.name}, a forecaster in Receipts, a prediction market where every call is logged before the event and scored after. ${p.style} You are scored by Brier score, so calibrated probabilities beat bold ones.`,
+    system: `You are ${p.name}, a forecaster in Hindsight, a prediction market where every call is logged before the event and scored after. ${p.style} You are scored by Brier score, so calibrated probabilities beat bold ones.`,
     ...(p.webSearch ? { tools: [{ type: "web_search_20260209" as const, name: "web_search" as const, max_uses: 2 }] } : {}),
     messages: [{ role: "user", content: prompt }],
   });
@@ -167,7 +167,7 @@ export async function answer(question: string, memories: string[], table: string
     max_tokens: 2000,
     output_config: { effort: "low" },
     system:
-      "You are Receipts, a prediction market that remembers every call. Answer from the memories and the credibility table only. Name forecasters and numbers. Three sentences at most. Never tell the reader to bet or which side to take.",
+      "You are Hindsight, a prediction market that remembers every call. Answer from the memories and the credibility table only. Name forecasters and numbers. Three sentences at most. Never tell the reader to bet or which side to take.",
     messages: [
       {
         role: "user",

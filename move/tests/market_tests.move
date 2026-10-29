@@ -1,7 +1,7 @@
 #[test_only]
-module receipts::market_tests;
+module hindsight::market_tests;
 
-use receipts::market::{Self, Market, Config, ResolverCap, Ticket};
+use hindsight::market::{Self, Market, Config, ResolverCap, Ticket};
 use std::unit_test::assert_eq;
 use sui::clock::{Self, Clock};
 use sui::coin::{Self, Coin};

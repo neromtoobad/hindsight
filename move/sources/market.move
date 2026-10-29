@@ -1,4 +1,4 @@
-/// Receipts: parimutuel prediction markets settled in SUI.
+/// Hindsight: parimutuel prediction markets settled in SUI.
 ///
 /// Every pick mints a Ticket owned by the picker. The Ticket is the receipt:
 /// it records the outcome, the stake, the clock time it was placed (always
@@ -9,7 +9,7 @@
 /// source named in `source` (Polymarket, ESPN, Pyth). If nobody backed the
 /// winning outcome, or the event is cancelled, the market is voided and every
 /// stake is refundable.
-module receipts::market;
+module hindsight::market;
 
 use std::string::String;
 use sui::balance::{Self, Balance};

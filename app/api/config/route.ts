@@ -4,8 +4,8 @@ export const dynamic = "force-dynamic";
 export async function GET() {
   return Response.json({
     network: process.env.SUI_NETWORK ?? "mainnet",
-    packageId: process.env.RECEIPTS_PACKAGE_ID ?? null,
-    configId: process.env.RECEIPTS_CONFIG_ID ?? null,
+    packageId: process.env.HINDSIGHT_PACKAGE_ID ?? null,
+    configId: process.env.HINDSIGHT_CONFIG_ID ?? null,
     minStakeMist: "10000000",
     maxStakeMist: "5000000000",
   });

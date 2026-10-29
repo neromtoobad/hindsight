@@ -33,7 +33,7 @@ const pkg = t.effects!.changedObjects.find((o) => o.outputState === "PackageWrit
 if (!pkg || !configId || !capId) throw new Error(`could not find ids: ${JSON.stringify({ pkg, configId, capId, types })}`);
 
 let env = fs.readFileSync(".env", "utf8");
-for (const [k, v] of Object.entries({ RECEIPTS_PACKAGE_ID: pkg, RECEIPTS_CONFIG_ID: configId, RECEIPTS_RESOLVER_CAP_ID: capId })) {
+for (const [k, v] of Object.entries({ HINDSIGHT_PACKAGE_ID: pkg, HINDSIGHT_CONFIG_ID: configId, HINDSIGHT_RESOLVER_CAP_ID: capId })) {
   env = new RegExp(`^${k}=.*$`, "m").test(env) ? env.replace(new RegExp(`^${k}=.*$`, "m"), `${k}=${v}`) : env + `\n${k}=${v}\n`;
 }
 fs.writeFileSync(".env", env, { mode: 0o600 });

@@ -7,7 +7,7 @@ export const dynamic = "force-dynamic";
 const PRICE_MIST = BigInt(process.env.SHARP_PRICE_MIST ?? "10000000"); // 0.01 SUI
 
 /**
- * The sharp line: Receipts' credibility-weighted probabilities for one market, with who moved it.
+ * The sharp line: Hindsight's credibility-weighted probabilities for one market, with who moved it.
  * Paid per call over x402, settled in SUI on Sui. Built for other agents to buy.
  */
 export async function GET(req: Request, { params }: { params: Promise<{ key: string }> }) {
@@ -17,7 +17,7 @@ export async function GET(req: Request, { params }: { params: Promise<{ key: str
   if (!m) return Response.json({ error: "not found" }, { status: 404 });
 
   const resource = new URL(req.url).pathname;
-  const r = requirement(resource, PRICE_MIST, `Receipts sharp line for "${m.question}"`);
+  const r = requirement(resource, PRICE_MIST, `Hindsight sharp line for "${m.question}"`);
   const v = await verify(req.headers.get("x-payment"), r);
   if (!v.ok) return v.res;
 

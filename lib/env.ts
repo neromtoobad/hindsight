@@ -17,9 +17,9 @@ export const env = {
   memoryEnabled: () => Boolean(process.env.MEMWAL_ACCOUNT_ID && process.env.MEMWAL_PRIVATE_KEY),
 
   resolverSecret: () => req("RESOLVER_SECRET"),
-  packageId: () => req("RECEIPTS_PACKAGE_ID"),
-  configId: () => req("RECEIPTS_CONFIG_ID"),
-  resolverCapId: () => req("RECEIPTS_RESOLVER_CAP_ID"),
+  packageId: () => req("HINDSIGHT_PACKAGE_ID"),
+  configId: () => req("HINDSIGHT_CONFIG_ID"),
+  resolverCapId: () => req("HINDSIGHT_RESOLVER_CAP_ID"),
 
   agentModel: process.env.AGENT_MODEL ?? "claude-opus-5-5",
   /** MIST each house agent stakes per pick. 0.02 SUI by default. */
