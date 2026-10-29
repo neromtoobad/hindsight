@@ -2,7 +2,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useCurrentAccount, useDAppKit } from "@mysten/dapp-kit-react";
 import { Transaction } from "@mysten/sui/transactions";
-import { AGENTS, AGENT_IDS, api, catColor, catIcon, payout, pct, sui, type Card, type Detail } from "./meta";
+import { AGENTS, AGENT_IDS, api, catColor, catIcon, payout, pct, sourceOf, sui, type Card, type Detail } from "./meta";
 
 const STAKES = [10_000_000n, 50_000_000n, 100_000_000n, 500_000_000n, 1_000_000_000n];
 
@@ -112,7 +112,7 @@ function Slip({ card, index, total, onPicked, toast }: { card: Card; index: numb
 
   const binary = card.outcomes.length === 2;
   const refs = Object.entries(card.ref);
-  const refName = (s: string) => (s === "polymarket" ? "Polymarket" : s === "bookmaker" ? "Bookmakers" : s);
+  const refName = (s: string) => sourceOf(s)?.name ?? s;
   const lead = binary ? 0 : card.trust.indexOf(Math.max(...card.trust));
   const tickRef = refs[0];
   // Where the public price would put the Yes/No boundary. Binary markets only.
@@ -198,7 +198,8 @@ function Slip({ card, index, total, onPicked, toast }: { card: Card; index: numb
           {tickAt !== null && tickRef && (
             <div className="tick" style={{ left: pct(tickAt) }}>
               <span>
-                {tickRef[0] === "polymarket" ? "POLY" : "BOOKS"} {pct(tickRef[1][0])}
+                {sourceOf(tickRef[0]) && <img className="srclogo" src={sourceOf(tickRef[0])!.img} alt="" style={{ width: 12, height: 12, marginRight: 4 }} />}
+                {pct(tickRef[1][0])}
               </span>
             </div>
           )}
@@ -206,7 +207,10 @@ function Slip({ card, index, total, onPicked, toast }: { card: Card; index: numb
         <div className="refs">
           {refs.slice(0, 1).map(([s, p]) => (
             <div className="ref" key={s}>
-              <span className="k">{refName(s)}</span>
+              <span className="k">
+                {sourceOf(s) && <img className="srclogo" src={sourceOf(s)!.img} alt="" />}
+                {refName(s)}
+              </span>
               <b>{binary ? pct(p[0]) : `${card.outcomes[lead].split(" ")[0]} ${pct(p[lead])}`}</b>
             </div>
           ))}

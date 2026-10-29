@@ -27,12 +27,14 @@ export const AGENTS: Record<string, { slug: string; short: string; tint: string;
 };
 export const AGENT_IDS = Object.keys(AGENTS);
 
-export const SOURCES: Record<string, { badge: string; color: string }> = {
-  "source:polymarket": { badge: "PM", color: "#7b61ff" },
-  "source:bookmaker": { badge: "BK", color: "#0f766e" },
+// Official marks: Polymarket's own app icon, and DraftKings' mark as ESPN serves it with the odds.
+export const SOURCES: Record<string, { name: string; img: string; color: string; logo?: boolean }> = {
+  "source:polymarket": { name: "Polymarket", img: "/sources/polymarket.png", color: "#1652f0" },
+  "source:bookmaker": { name: "DraftKings", img: "/sources/draftkings.svg", color: "#53b74b", logo: true },
 };
+export const sourceOf = (ref: string) => SOURCES[`source:${ref}`];
 
-export function avatar(id: string): { img?: string; badge?: string; color: string } {
+export function avatar(id: string): { img?: string; badge?: string; color: string; logo?: boolean } {
   if (AGENTS[id]) return { img: `/agents/${AGENTS[id].slug}-head.png`, color: AGENTS[id].color };
   if (SOURCES[id]) return SOURCES[id];
   const hue = parseInt(id.slice(2, 8) || "0", 16) % 360;

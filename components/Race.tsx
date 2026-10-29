@@ -30,7 +30,7 @@ export function Race({ rows, you }: { rows: Row[]; you?: string }) {
               <div className="track">
                 {moved && <div className="trail" style={{ left: `${Math.min(trailFrom, x)}%`, width: `${Math.abs(x - trailFrom)}%`, background: a.color }} />}
                 {a.img ? (
-                  <img className="runner" src={a.img} style={{ left: `${x}%` }} alt="" />
+                  <img className={`runner${a.logo ? " logo" : ""}`} src={a.img} style={{ left: `${x}%` }} alt={r.name} />
                 ) : (
                   <span className="runner" style={{ left: `${x}%`, background: a.color }}>{a.badge}</span>
                 )}

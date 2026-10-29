@@ -16,13 +16,14 @@ const iso = (t: number) => new Date(t).toISOString().slice(0, 16) + "Z";
 
 export const SOURCES = {
   "source:polymarket": { name: "Polymarket", blurb: "Onchain order book prices on Polygon." },
-  "source:bookmaker": { name: "Bookmakers", blurb: "DraftKings closing line via ESPN, vig removed." },
+  "source:bookmaker": { name: "DraftKings", blurb: "DraftKings closing line via ESPN, vig removed." },
 } as const;
 
 export const agentId = (p: Persona) => `agent:${p.slug}`;
 
 export function ensureForecasters(db: Db) {
-  for (const [id, s] of Object.entries(SOURCES)) db.forecasters[id] ??= { id, kind: "source", ...s };
+  // Sources are refreshed every pass so a rename (e.g. "Bookmakers" -> "DraftKings") reaches old data.
+  for (const [id, s] of Object.entries(SOURCES)) db.forecasters[id] = { id, kind: "source", ...s };
   for (const p of PERSONAS) db.forecasters[agentId(p)] ??= { id: agentId(p), kind: "agent", name: p.name, blurb: p.blurb };
 }
 

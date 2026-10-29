@@ -36,6 +36,10 @@ export default function ForecasterPage({ params }: { params: Promise<{ id: strin
         <div className="hero" style={{ background: agent?.tint ?? "#fff" }}>
           {agent ? (
             <img src={`/agents/${agent.slug}.png`} alt={p?.name ?? ""} />
+          ) : av.img ? (
+            <div style={{ height: 200, display: "grid", placeItems: "center" }}>
+              <img src={av.img} alt={p?.name ?? ""} style={{ width: 120, height: 120, borderRadius: 30, background: "#fff", padding: av.logo ? 14 : 0, boxShadow: "0 8px 24px -10px #0004", mixBlendMode: "normal" }} />
+            </div>
           ) : (
             <div style={{ height: 200, display: "grid", placeItems: "center" }}>
               <span className="runner" style={{ position: "static", transform: "none", width: 120, height: 120, borderRadius: 34, fontSize: 40, background: av.color }}>
