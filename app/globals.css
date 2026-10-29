@@ -466,3 +466,33 @@ table.sc td:not(:first-child) { text-align: right; }
   .docktip { display: none; }
   .chatwin { left: 8px; right: 8px; width: auto; bottom: 8px; top: 8px; max-height: none; }
 }
+
+/* ---------- your character ---------- */
+.mechip { display: inline-flex; align-items: center; gap: 8px; padding: 4px 12px 4px 4px; border-radius: 14px; background: #fff; border: 1.5px solid var(--line); font-weight: 800; }
+.mechip img { width: 34px; height: 34px; border-radius: 11px; object-fit: cover; }
+.mechip.make { padding: 9px 13px; background: var(--lime); border-color: var(--ink); box-shadow: 0 3px 0 var(--ink); }
+.mechip .plus { font-size: 16px; line-height: 1; }
+.modalbg { position: fixed; inset: 0; z-index: 60; background: #14141466; display: grid; place-items: center; padding: 16px; }
+.builder { position: relative; width: min(860px, 100%); max-height: calc(100vh - 32px); overflow-y: auto; background: #fff; border-radius: 30px; display: grid; grid-template-columns: 300px minmax(0, 1fr); box-shadow: 0 40px 90px -30px #000a; }
+.builder > .x { position: absolute; top: 14px; right: 16px; font-size: 16px; z-index: 2; }
+.bpreview { display: flex; flex-direction: column; align-items: center; justify-content: flex-end; padding: 22px 16px; gap: 2px; min-height: 360px; }
+.bpreview img { width: 100%; max-height: 260px; object-fit: contain; filter: drop-shadow(0 18px 18px #0003); }
+.bname { font: 800 26px var(--display); letter-spacing: -.8px; }
+.bcontrols { padding: 24px 24px 22px; display: flex; flex-direction: column; gap: 10px; }
+.bcontrols h2 { font: 800 26px var(--display); letter-spacing: -.8px; margin: 0; }
+.bgrid { display: grid; grid-template-columns: repeat(6, 1fr); gap: 6px; }
+.bgrid button { aspect-ratio: 1; border-radius: 14px; background: var(--bg); padding: 2px; border: 2px solid transparent; }
+.bgrid button.on { border-color: var(--ink); }
+.bgrid img { width: 100%; height: 100%; object-fit: contain; }
+.btints { display: flex; gap: 8px; flex-wrap: wrap; }
+.btints button { width: 32px; height: 32px; border-radius: 10px; border: 2px solid #0001; }
+.btints button.on { border-color: var(--ink); box-shadow: 0 0 0 2px #fff inset; }
+.bin { border: 2px solid var(--ink); border-radius: 13px; padding: 10px 12px; font: 700 16px var(--display); }
+@media (max-width: 700px) {
+  .builder { grid-template-columns: minmax(0, 1fr); }
+  .bpreview { min-height: 220px; }
+  .bpreview img { max-height: 160px; }
+  .bgrid { grid-template-columns: repeat(4, 1fr); }
+  .mechip b { display: none; }
+  .mechip { padding: 4px; }
+}

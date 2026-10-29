@@ -1,6 +1,7 @@
 "use client";
 import { createDAppKit, DAppKitProvider } from "@mysten/dapp-kit-react";
 import { SuiGraphQLClient } from "@mysten/sui/graphql";
+import { CharacterBuilder } from "@/components/Character";
 
 // The wallet only signs and submits. Transactions are built server-side through Tatum.
 const dAppKit = createDAppKit({
@@ -17,5 +18,10 @@ declare module "@mysten/dapp-kit-react" {
 }
 
 export function Providers({ children }: { children: React.ReactNode }) {
-  return <DAppKitProvider dAppKit={dAppKit}>{children}</DAppKitProvider>;
+  return (
+    <DAppKitProvider dAppKit={dAppKit}>
+      {children}
+      <CharacterBuilder />
+    </DAppKitProvider>
+  );
 }

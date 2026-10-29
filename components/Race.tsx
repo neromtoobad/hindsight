@@ -18,7 +18,7 @@ export function Race({ rows, you }: { rows: Row[]; you?: string }) {
       </div>
       <div style={{ marginTop: 8 }}>
         {lanes.map((r) => {
-          const a = avatar(r.id);
+          const a = avatar(r.id, r);
           const x = pos(r.skill, r.n);
           const moved = Math.abs(r.trend) > 0.02;
           const trailFrom = moved ? Math.max(6, Math.min(92, x - Math.sign(r.trend) * Math.min(30, Math.abs(r.trend) * 40))) : x;
@@ -30,7 +30,7 @@ export function Race({ rows, you }: { rows: Row[]; you?: string }) {
               <div className="track">
                 {moved && <div className="trail" style={{ left: `${Math.min(trailFrom, x)}%`, width: `${Math.abs(x - trailFrom)}%`, background: a.color }} />}
                 {a.img ? (
-                  <img className={`runner${a.logo ? " logo" : ""}`} src={a.img} style={{ left: `${x}%` }} alt={r.name} />
+                  <img className={`runner${a.logo ? " logo" : ""}`} src={a.img} style={{ left: `${x}%`, background: r.avatar ? a.color : undefined }} alt={r.name} />
                 ) : (
                   <span className="runner" style={{ left: `${x}%`, background: a.color }}>{a.badge}</span>
                 )}

@@ -9,11 +9,12 @@ export type You = { outcome: number; conf: number };
 const clamp = (x: number, a: number, b: number) => Math.min(b, Math.max(a, x));
 
 function Marker({ s, size, faded }: { s: Stand; size: number; faded?: boolean }) {
-  const a = avatar(s.id);
+  const a = avatar(s.id, s);
   const title = `${s.name}: ${s.probs.map((p) => pct(p)).join(" / ")} · trust ${s.w.toFixed(1)}×`;
   const style = { width: size, height: size, opacity: faded ? 0.55 : 1 } as const;
   if (AGENTS[s.id]) return <img className="mk agent" src={a.img} alt={s.name} title={title} style={{ ...style, background: AGENTS[s.id].tint }} />;
   if (SOURCES[s.id]) return <img className="mk src" src={a.img} alt={s.name} title={title} style={style} />;
+  if (a.img) return <img className="mk agent" src={a.img} alt={s.name} title={title} style={{ ...style, background: a.color }} />;
   return (
     <span className="mk human" title={title} style={{ ...style, background: a.color, fontSize: size * 0.36 }}>
       {a.badge}

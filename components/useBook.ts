@@ -48,6 +48,11 @@ export function useBook() {
     const t = setInterval(loadBets, 30_000);
     return () => clearInterval(t);
   }, [loadBets]);
+  // A saved character should show up on every line and in the race straight away.
+  useEffect(() => {
+    window.addEventListener("hs:profile", load);
+    return () => window.removeEventListener("hs:profile", load);
+  }, [load]);
 
   // Keep the selected card in step with fresh data (pool, trust line) without losing your stance.
   useEffect(() => {

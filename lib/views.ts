@@ -29,6 +29,8 @@ export function marketCard(db: Db, m: MarketRec) {
       id: c.forecaster,
       name: db.forecasters[c.forecaster]?.name ?? c.forecaster,
       kind: db.forecasters[c.forecaster]?.kind ?? "human",
+      avatar: db.forecasters[c.forecaster]?.avatar ?? null,
+      tint: db.forecasters[c.forecaster]?.tint ?? null,
       w: +c.w.toFixed(2),
       probs: c.probs.map((x) => +x.toFixed(3)),
       reasoning: picks.filter((p) => p.forecaster === c.forecaster).sort((a, b) => b.placedAt - a.placedAt)[0]?.reasoning ?? null,
@@ -85,7 +87,7 @@ export function leaderboard(db: Db, scope = "all") {
       const picks = db.picks.filter((p) => p.forecaster === f.id);
       const w = Math.exp(4 * s.skill * (s.n / (s.n + 4)));
       const wPrev = prev?.weights[f.id]?.[scope] ?? 1;
-      return { id: f.id, name: f.name, kind: f.kind, blurb: f.blurb, ...s, w, trend: w - wPrev, picks: picks.length, open: picks.filter((p) => p.brier === undefined).length };
+      return { id: f.id, name: f.name, kind: f.kind, blurb: f.blurb, avatar: f.avatar ?? null, tint: f.tint ?? null, ...s, w, trend: w - wPrev, picks: picks.length, open: picks.filter((p) => p.brier === undefined).length };
     })
     .sort((a, b) => b.skill * Math.min(1, b.n / 5) - a.skill * Math.min(1, a.n / 5) || b.picks - a.picks);
 }

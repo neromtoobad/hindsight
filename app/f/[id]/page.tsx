@@ -6,6 +6,8 @@ import { AGENTS, avatar, api, ago, pct, short, sui, type PickV } from "@/compone
 type Profile = {
   id: string;
   name: string;
+  avatar?: string;
+  tint?: string;
   kind: "human" | "agent" | "source";
   blurb?: string;
   scopes: { scope: string; skill: number; n: number; hitRate: number }[];
@@ -26,16 +28,18 @@ export default function ForecasterPage({ params }: { params: Promise<{ id: strin
   }, [id]);
 
   const agent = AGENTS[id];
-  const av = avatar(id);
+  const av = avatar(id, p);
   const all = p?.scopes.find((s) => s.scope === "all");
 
   return (
     <>
       <Header />
       <main className="prof">
-        <div className="hero" style={{ background: agent?.tint ?? "#fff" }}>
+        <div className="hero" style={{ background: agent?.tint ?? p?.tint ?? "#fff" }}>
           {agent ? (
             <img src={`/agents/${agent.slug}.png`} alt={p?.name ?? ""} />
+          ) : p?.avatar ? (
+            <img src={`/players/${p.avatar}.png`} alt={p.name} />
           ) : av.img ? (
             <div style={{ height: 200, display: "grid", placeItems: "center" }}>
               <img src={av.img} alt={p?.name ?? ""} style={{ width: 120, height: 120, borderRadius: 30, background: "#fff", padding: av.logo ? 14 : 0, boxShadow: "0 8px 24px -10px #0004", mixBlendMode: "normal" }} />

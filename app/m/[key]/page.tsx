@@ -52,10 +52,10 @@ export default function MarketPage({ params }: { params: Promise<{ key: string }
               <div className="callgrid">
                 {card.stands.map((s) => {
                   const top = s.probs.indexOf(Math.max(...s.probs));
-                  const a = avatar(s.id);
+                  const a = avatar(s.id, s);
                   const agent = AGENTS[s.id];
                   return (
-                    <div className="callcard" key={s.id} style={{ background: agent?.tint ?? "#fff" }}>
+                    <div className="callcard" key={s.id} style={{ background: agent?.tint ?? s.tint ?? "#fff" }}>
                       <a className="who2" href={`/f/${encodeURIComponent(s.id)}`}>
                         {a.img ? <img src={a.img} alt="" className={SOURCES[s.id] ? "logo" : ""} /> : <span className="badge2" style={{ background: a.color }}>{a.badge}</span>}
                         <span>

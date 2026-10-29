@@ -1,8 +1,38 @@
 "use client";
-import { CATS } from "./meta";
+import { useEffect, useState } from "react";
+import { useCurrentAccount } from "@mysten/dapp-kit-react";
+import { CATS, api } from "./meta";
+import { openCharacter } from "./Character";
 import { WalletButton } from "./Wallet";
 import { Mark } from "./Logo";
 
+type Me = { name: string; avatar?: string; tint?: string };
+
+/** Your character chip: opens the builder. Refreshes when the profile is saved. */
+function MeChip() {
+  const account = useCurrentAccount();
+  const [me, setMe] = useState<Me | null>(null);
+  useEffect(() => {
+    if (!account) return setMe(null);
+    const load = () => api<Me>(`/api/forecasters/${account.address}`).then(setMe).catch(() => setMe(null));
+    load();
+    window.addEventListener("hs:profile", load);
+    return () => window.removeEventListener("hs:profile", load);
+  }, [account]);
+  if (!account) return null;
+  if (!me?.avatar)
+    return (
+      <button className="mechip make" onClick={openCharacter}>
+        <span className="plus">+</span> Make your character
+      </button>
+    );
+  return (
+    <button className="mechip" onClick={openCharacter} title="Edit your character">
+      <img src={`/players/${me.avatar}-head.png`} alt="" style={{ background: me.tint }} />
+      <b>{me.name}</b>
+    </button>
+  );
+}
 export function Header({
   cat,
   setCat,
@@ -33,6 +63,7 @@ export function Header({
         </nav>
       )}
       <div className="wallet">
+        <MeChip />
         {onMyBets ? (
           <button className="mybets" onClick={onMyBets}>
             My bets{myBets ? <span className="badge">{myBets}</span> : null}

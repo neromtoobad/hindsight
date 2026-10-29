@@ -35,6 +35,9 @@ export interface Forecaster {
   name: string;
   /** Short bio shown on profiles. */
   blurb?: string;
+  /** Player-chosen character (see lib/profile.ts) and background colour. */
+  avatar?: string;
+  tint?: string;
 }
 
 export interface PickRec {

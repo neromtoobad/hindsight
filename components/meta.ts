@@ -34,8 +34,9 @@ export const SOURCES: Record<string, { name: string; img: string; color: string;
 };
 export const sourceOf = (ref: string) => SOURCES[`source:${ref}`];
 
-export function avatar(id: string): { img?: string; badge?: string; color: string; logo?: boolean } {
+export function avatar(id: string, me?: { avatar?: string | null; tint?: string | null } | null): { img?: string; badge?: string; color: string; logo?: boolean } {
   if (AGENTS[id]) return { img: `/agents/${AGENTS[id].slug}-head.png`, color: AGENTS[id].color };
+  if (me?.avatar) return { img: `/players/${me.avatar}-head.png`, color: me.tint ?? "#dcefff" };
   if (SOURCES[id]) return SOURCES[id];
   const hue = parseInt(id.slice(2, 8) || "0", 16) % 360;
   return { badge: id.slice(2, 4), color: `hsl(${hue} 45% 32%)` };
