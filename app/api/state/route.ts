@@ -1,5 +1,5 @@
 import { load } from "@/lib/store";
-import { leaderboard, marketCard, stats } from "@/lib/views";
+import { leaderboard, marketCard, stats, x402Feed } from "@/lib/views";
 
 export const dynamic = "force-dynamic";
 
@@ -19,5 +19,6 @@ export async function GET() {
     awaiting: live.map((m) => marketCard(db, m)),
     settled: settled.map((m) => marketCard(db, m)),
     leaderboard: leaderboard(db),
+    x402: x402Feed(db),
   });
 }

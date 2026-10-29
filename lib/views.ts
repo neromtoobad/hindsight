@@ -1,6 +1,7 @@
 // Read models for the API. Pure functions over the store.
 import { line, disagreement, skill, weight } from "./credibility";
 import type { Db, MarketRec, PickRec } from "./types";
+import { agentAddresses, PERSONAS } from "./agents";
 
 export function marketCard(db: Db, m: MarketRec) {
   const l = line(db, m);
@@ -112,4 +113,28 @@ export function stats(db: Db) {
     memories: stored,
     memoriesQueued: db.memory.filter((m) => m.status === "queued").length,
   };
+}
+
+/** Paid x402 calls, newest first, with payer and market named. */
+export function x402Feed(db: Db, limit = 12) {
+  const agents = agentAddresses();
+  const price = process.env.SHARP_PRICE_MIST ?? "10000000";
+  const rows = Object.entries(db.paid)
+    .map(([digest, p]) => {
+      const key = decodeURIComponent(p.resource.split("/").pop() ?? "");
+      const slug = agents[p.payer];
+      const persona = PERSONAS.find((x) => x.slug === slug);
+      return {
+        digest,
+        at: p.at,
+        mist: p.mist ?? price,
+        payer: p.payer,
+        payerId: slug ? `agent:${slug}` : p.payer,
+        payerName: persona?.name ?? db.forecasters[p.payer]?.name ?? `${p.payer.slice(0, 6)}…${p.payer.slice(-4)}`,
+        marketKey: key,
+        question: db.markets[key]?.question ?? key,
+      };
+    })
+    .sort((a, b) => b.at - a.at);
+  return { calls: rows.length, totalMist: String(rows.reduce((s, r) => s + BigInt(r.mist), 0n)), recent: rows.slice(0, limit) };
 }

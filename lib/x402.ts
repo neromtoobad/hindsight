@@ -73,7 +73,7 @@ export async function verify(header: string | null, req: Requirement): Promise<{
   const payer = t.transaction?.sender ?? "unknown";
   const fresh = await mutate((db) => {
     if (db.paid[digest]) return false;
-    db.paid[digest] = { at: Date.now(), resource: req.resource, payer };
+    db.paid[digest] = { at: Date.now(), resource: req.resource, payer, mist: received.toString() };
     return true;
   });
   if (!fresh) return { ok: false, res: paymentRequired(req, "payment already used") };

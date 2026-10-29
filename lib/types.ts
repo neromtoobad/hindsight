@@ -89,5 +89,5 @@ export interface Db {
   memory: MemoryWrite[];
   snapshots: WeightSnapshot[];
   /** x402 payment digests already redeemed. */
-  paid: Record<string, { at: number; resource: string; payer: string }>;
+  paid: Record<string, { at: number; resource: string; payer: string; mist?: string }>;
 }

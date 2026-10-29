@@ -8,6 +8,7 @@ import { SlipPanel } from "@/components/BetSlip";
 import { Race } from "@/components/Race";
 import { MemoryFeed } from "@/components/Memory";
 import { Ask } from "@/components/Ask";
+import { X402Panel, type X402Feed } from "@/components/X402";
 import { CATS, api, type Card, type PickV, type Row } from "@/components/meta";
 
 type State = {
@@ -16,6 +17,7 @@ type State = {
   awaiting: Card[];
   settled: Card[];
   leaderboard: Row[];
+  x402?: X402Feed;
 };
 
 export default function Home() {
@@ -122,6 +124,7 @@ export default function Home() {
           </button>
           <SlipPanel tab={tab} setTab={setTab} selection={selection} clear={() => setSelection(null)} bets={bets} reloadBets={() => { loadBets(); load(); }} toast={toast} />
           <Race rows={state?.leaderboard ?? []} you={account?.address} />
+          <X402Panel feed={state?.x402} />
           <Ask />
           <MemoryFeed items={memory} stored={state?.stats.memories ?? 0} />
         </aside>

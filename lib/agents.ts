@@ -53,6 +53,16 @@ export const PERSONAS: Persona[] = [
 
 const walletFile = () => path.join(env.dataDir, "agents.json");
 
+/** address -> persona slug, read-only (never creates keys). Used to name x402 payers. */
+export function agentAddresses(): Record<string, string> {
+  try {
+    const w = JSON.parse(fs.readFileSync(walletFile(), "utf8")) as Record<string, { address: string }>;
+    return Object.fromEntries(Object.entries(w).map(([slug, v]) => [v.address, slug]));
+  } catch {
+    return {};
+  }
+}
+
 export function agentWallets(): Record<string, { secret: string; address: string }> {
   let w: Record<string, { secret: string; address: string }> = {};
   try {
