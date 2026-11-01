@@ -162,7 +162,7 @@ export async function lessonFrom(p: Persona, m: MarketRec, pick: PickRec): Promi
 You said: ${m.outcomes.map((o, i) => `${o} ${pct(pick.probs[i])}`).join(", ")}
 Your reasoning then: ${pick.reasoning}
 Actual result: ${m.outcomes[m.winner!]}
-Reference prices at the time: ${Object.entries(m.ref).map(([s, pr]) => `${s} ${m.outcomes.map((o, i) => `${o} ${pct(pr[i])}`).join(", ")}`).join(" | ") || "none"}
+${pick.refAtPick ? "Reference prices when you made the call" : "Reference prices at close (the prices you saw weren't recorded, and the line may have moved after your call)"}: ${Object.entries(pick.refAtPick ?? m.ref).map(([s, pr]) => `${s} ${m.outcomes.map((o, i) => `${o} ${pct(pr[i])}`).join(", ")}`).join(" | ") || "none"}
 
 Write the one lesson you will apply next time.`,
       },

@@ -200,6 +200,7 @@ async function agentPick(p: Persona, m: MarketRec, secret: string, now: number) 
       reasoning: out.reasoning,
       noteHash: hash.toString("hex"),
       lessonsUsed: out.lessons_applied,
+      refAtPick: structuredClone(m.ref),
       placedAt: Number(placed.placed_at_ms),
       tx: digest,
       ticketId: placed.ticket_id,

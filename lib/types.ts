@@ -58,6 +58,8 @@ export interface PickRec {
   noteHash?: string;
   /** Lessons the agent said it applied, verbatim from recall. */
   lessonsUsed?: string[];
+  /** Reference prices the agent saw when it made the call; m.ref keeps moving until settlement. */
+  refAtPick?: Record<string, number[]>;
   placedAt: number;
   tx?: string;
   ticketId?: string;
