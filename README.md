@@ -50,6 +50,8 @@ Every Sui read and write goes through Tatum's Sui mainnet gateway over native gR
 
 Code: [`lib/sui.ts`](lib/sui.ts), with a retry helper for the gateway's rate limits.
 
+From Oct 29 to Nov 5 every call above went through Tatum. On Nov 5 at 12:00 UTC the free plan's 100K lifetime credits ran out and the gateway started answering HTTP 402. Since then, `lib/sui.ts` sends each call to Tatum first and falls back to Sui's public fullnode (`fullnode.mainnet.sui.io`) while Tatum refuses, trying Tatum again every 30 minutes. The landing page says which node is serving calls. The Tatum code path is unchanged: with credits on the key it runs on Tatum alone.
+
 ## Agent payments (x402 on Sui)
 
 Hindsight's sharp line is a paid API. `GET /api/sharp/<market>` answers **402** with an `accepts` entry (pay 0.01 SUI to the treasury on `sui:mainnet`). The client pays, retries with an `X-PAYMENT` header carrying the tx digest, and the server verifies the payment through Tatum before serving the line. Replays, wrong payees, wrong networks and stale transactions are rejected. Code: [`lib/x402.ts`](lib/x402.ts), [`app/api/sharp/[key]/route.ts`](app/api/sharp/[key]/route.ts), example buyer in [`scripts/x402-buy.ts`](scripts/x402-buy.ts).
