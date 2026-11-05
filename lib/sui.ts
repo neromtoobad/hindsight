@@ -1,28 +1,53 @@
-// Every Sui read and write goes through Tatum's gateway (gRPC, x-api-key).
+// Every Sui read and write goes through Tatum's gateway (gRPC, x-api-key), with Sui's public
+// fullnode as a fallback while Tatum answers 402.
 import { SuiGrpcClient } from "@mysten/sui/grpc";
 import { GrpcTransport } from "@protobuf-ts/grpc-transport";
 import { ChannelCredentials } from "@grpc/grpc-js";
 import { Transaction, coinWithBalance } from "@mysten/sui/transactions";
 import { Ed25519Keypair } from "@mysten/sui/keypairs/ed25519";
 import { bcs } from "@mysten/sui/bcs";
+import fs from "node:fs";
+import path from "node:path";
 import { env } from "./env";
 
-let _client: SuiGrpcClient | null = null;
+let _tatum: SuiGrpcClient | null = null;
+let _public: SuiGrpcClient | null = null;
+
+// Sui's own public fullnode, used only while Tatum refuses us (HTTP 402: plan credits used up).
+const PUBLIC_GRPC = process.env.SUI_PUBLIC_GRPC ?? "fullnode.mainnet.sui.io:443";
+const RETRY_TATUM_MS = 30 * 60_000;
+let tatumDownSince = 0;
+
+const grpc = (host: string, meta?: Record<string, string>) =>
+  new SuiGrpcClient({
+    network: env.network,
+    transport: new GrpcTransport({
+      host: host.includes(":") ? host : `${host}:443`,
+      channelCredentials: ChannelCredentials.createSsl(),
+      meta,
+    }),
+  });
+
+/** Which node serves Sui calls right now, for the status line. */
+export function suiRoute() {
+  const down = tatumDownSince > 0 && Date.now() - tatumDownSince < RETRY_TATUM_MS;
+  return down ? { via: "sui-public" as const, since: tatumDownSince } : { via: "tatum" as const };
+}
+
+/** The route as the app and the worker saw it last (they are separate processes). */
+export function rpcStatus() {
+  try {
+    const { tatum402At } = JSON.parse(fs.readFileSync(path.join(env.dataDir, "rpc.json"), "utf8"));
+    if (Date.now() - tatum402At < RETRY_TATUM_MS + 10 * 60_000) return { via: "sui-public" as const, since: tatum402At as number };
+  } catch {}
+  return suiRoute();
+}
 
 // Tatum serves native gRPC (application/grpc), not gRPC-web, so we bring an HTTP/2 transport.
+// Every call goes to Tatum first; after a 402 we use the public fullnode and try Tatum again in 30 min.
 export function sui(): SuiGrpcClient {
-  if (!_client) {
-    const host = env.grpcUrl.replace(/^https?:\/\//, "").replace(/\/$/, "");
-    _client = new SuiGrpcClient({
-      network: env.network,
-      transport: new GrpcTransport({
-        host: host.includes(":") ? host : `${host}:443`,
-        channelCredentials: ChannelCredentials.createSsl(),
-        meta: { "x-api-key": env.tatumKey() },
-      }),
-    });
-  }
-  return _client;
+  if (suiRoute().via === "sui-public") return (_public ??= grpc(PUBLIC_GRPC));
+  return (_tatum ??= grpc(env.grpcUrl.replace(/^https?:\/\//, "").replace(/\/$/, ""), { "x-api-key": env.tatumKey() }));
 }
 
 export const keypairFrom = (secret: string) => Ed25519Keypair.fromSecretKey(secret);
@@ -62,13 +87,23 @@ export const ResolvedEvent = bcs.struct("Resolved", {
 
 const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
 
-/** Tatum rate-limits bursts (HTTP 429). A rejected request was never executed, so retrying is safe. */
+/** Tatum rate-limits bursts (HTTP 429) and refuses everything once plan credits run out (HTTP 402).
+ * A rejected request was never executed, so retrying (or retrying on the fallback node) is safe. */
 export async function tatum<T>(fn: () => Promise<T>, tries = 6): Promise<T> {
   for (let i = 0; ; i++) {
     try {
       return await fn();
     } catch (e) {
       const msg = String((e as Error)?.message ?? e);
+      if (/status code 402/.test(msg) && suiRoute().via === "tatum") {
+        console.log("tatum returned 402 (plan limit), switching to the public Sui fullnode");
+        tatumDownSince = Date.now();
+        try {
+          fs.mkdirSync(env.dataDir, { recursive: true });
+          fs.writeFileSync(path.join(env.dataDir, "rpc.json"), JSON.stringify({ tatum402At: tatumDownSince }));
+        } catch {}
+        continue;
+      }
       if (i >= tries - 1 || !/429|RESOURCE_EXHAUSTED|rate limit/i.test(msg)) throw e;
       await sleep(700 * 2 ** i);
     }

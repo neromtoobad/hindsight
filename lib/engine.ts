@@ -115,8 +115,20 @@ export async function fundAgents(log = console.log) {
   const topUp = BigInt(process.env.AGENT_TOPUP_MIST ?? "600000000"); // 0.6 SUI
   // Keep enough on the resolver to open and settle markets.
   const reserve = BigInt(process.env.RESOLVER_RESERVE_MIST ?? "250000000"); // 0.25 SUI
+  const owed = owedTickets();
   for (const [slug, w] of Object.entries(wallets)) {
     const bal = await chain.balanceOf(w.address);
+    // An agent sitting on unclaimed winnings only needs gas to collect them, so a small grant
+    // goes out even when the resolver can't afford a full top-up.
+    if (bal < CLAIM_GAS_MIST && owed.has(slug)) {
+      if ((await chain.balanceOf(r.toSuiAddress())) < GAS_GRANT_MIST + CLAIM_GAS_MIST * 20n) {
+        log(`resolver too low for a gas grant to ${slug}; skipping`);
+        continue;
+      }
+      const d = await chain.sendSui(r, w.address, GAS_GRANT_MIST);
+      log(`gas grant ${slug} ${chain.fmtSui(GAS_GRANT_MIST)} SUI to claim ${owed.get(slug)} tickets (${d})`);
+      continue;
+    }
     if (bal < floor) {
       if ((await chain.balanceOf(r.toSuiAddress())) < topUp + reserve) {
         log(`resolver too low to fund ${slug}; skipping`);
@@ -342,20 +354,43 @@ async function settle(key: string, winner: number, voided: boolean, digest: stri
   }
 }
 
+// A claim costs about 0.0012 SUI of gas.
+const CLAIM_GAS_MIST = 3_000_000n;
+const GAS_GRANT_MIST = BigInt(process.env.AGENT_GAS_GRANT_MIST ?? "15000000"); // 0.015 SUI
+
+const isOwed = (db: ReturnType<typeof load>, p: ReturnType<typeof load>["picks"][number]) => {
+  const m = db.markets[p.marketKey];
+  return p.forecaster.startsWith("agent:") && !!p.ticketId && !p.claimed && (m.status === "void" || (m.status === "resolved" && p.outcome === m.winner));
+};
+
+/** Unclaimed winning or refunded tickets per agent slug. */
+function owedTickets() {
+  const db = load();
+  const n = new Map<string, number>();
+  for (const p of db.picks) if (isOwed(db, p)) n.set(p.forecaster.slice("agent:".length), (n.get(p.forecaster.slice("agent:".length)) ?? 0) + 1);
+  return n;
+}
+
 /** House agents collect winnings and refunds so their stakes recycle. */
 export async function agentClaimRound(log = console.log) {
   const wallets = agentWallets();
   const db = load();
+  const hasGas = new Map<string, boolean>();
   for (const p of db.picks) {
-    if (!p.forecaster.startsWith("agent:") || !p.ticketId || p.claimed) continue;
+    if (!isOwed(db, p)) continue;
     const m = db.markets[p.marketKey];
-    const owed = m.status === "void" || (m.status === "resolved" && p.outcome === m.winner);
-    if (!owed) continue;
-    const w = wallets[p.forecaster.slice("agent:".length)];
+    const slug = p.forecaster.slice("agent:".length);
+    const w = wallets[slug];
     if (!w) continue;
+    // Without gas every attempt fails, and each one still costs node calls; wait for a grant.
+    if (!hasGas.has(slug)) {
+      hasGas.set(slug, (await chain.balanceOf(w.address).catch(() => 0n)) >= CLAIM_GAS_MIST);
+      if (!hasGas.get(slug)) log(`claims: ${slug} has no gas, waiting for a grant`);
+    }
+    if (!hasGas.get(slug)) continue;
     try {
       const kp = chain.keypairFrom(w.secret);
-      await chain.runAs(chain.buildClaimTx({ marketId: m.onchainId!, ticketId: p.ticketId, sender: w.address }), kp);
+      await chain.runAs(chain.buildClaimTx({ marketId: m.onchainId!, ticketId: p.ticketId!, sender: w.address }), kp);
       await mutate((d) => Object.assign(d.picks.find((x) => x.id === p.id)!, { claimed: true }));
     } catch (e) {
       log(`claim ${p.id}: ${(e as Error).message}`);

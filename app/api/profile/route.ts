@@ -2,7 +2,7 @@ import { z } from "zod";
 import { normalizeSuiAddress } from "@mysten/sui/utils";
 import { verifyPersonalMessageSignature } from "@mysten/sui/verify";
 import { mutate } from "@/lib/store";
-import { sui } from "@/lib/sui";
+import { sui, tatum } from "@/lib/sui";
 import { remember } from "@/lib/memory";
 import { CHARACTERS, TINTS, cleanName, profileMessage } from "@/lib/profile";
 
@@ -28,7 +28,7 @@ export async function POST(req: Request) {
 
   const msg = new TextEncoder().encode(profileMessage({ address: b.address, name: b.name, avatar: b.avatar, tint: b.tint, issuedAt: b.issuedAt }));
   try {
-    await verifyPersonalMessageSignature(msg, b.signature, { address, client: sui() });
+    await tatum(() => verifyPersonalMessageSignature(msg, b.signature, { address, client: sui() }));
   } catch {
     return Response.json({ error: "signature does not match this wallet" }, { status: 401 });
   }

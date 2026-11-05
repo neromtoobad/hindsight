@@ -14,6 +14,7 @@ export type BookState = {
   settled: Card[];
   leaderboard: Row[];
   x402?: X402Feed;
+  rpc?: { via: "tatum" | "sui-public"; since?: number };
 };
 
 /** Everything the home and market pages share: live data, your bets, the slip, toasts. */

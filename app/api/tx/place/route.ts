@@ -1,7 +1,7 @@
 import { z } from "zod";
 import { toBase64 } from "@mysten/sui/utils";
 import { load } from "@/lib/store";
-import { buildPlaceTx, sui } from "@/lib/sui";
+import { buildPlaceTx, sui, tatum } from "@/lib/sui";
 import { sha256 } from "@/lib/memory";
 import { humanNote } from "@/lib/engine";
 
@@ -29,7 +29,7 @@ export async function POST(req: Request) {
   const noteHash = sha256(humanNote({ marketKey: b.marketKey, outcome: b.outcome, confidence: b.confidence, reasoning: b.reasoning }));
   const tx = buildPlaceTx({ marketId: m.onchainId, outcome: b.outcome, stakeMist: BigInt(b.stakeMist), noteHash, sender: b.sender });
   try {
-    const bytes = await tx.build({ client: sui() });
+    const bytes = await tatum(() => tx.build({ client: sui() }));
     return Response.json({ bytes: toBase64(bytes) });
   } catch (e) {
     const msg = (e as Error).message;

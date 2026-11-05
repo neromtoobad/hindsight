@@ -234,7 +234,15 @@ export default function Landing() {
             <div className="builtgrid">
               <div><b>Sui</b><span>Markets are shared objects; every bet is a Ticket you own. {stats ? `${sui(stats.stakedMist)} SUI staked so far.` : ""}</span></div>
               <div><b>Walrus Memory</b><span>Picks, scorecards, lessons and trust tables, written as they happen and recalled by the agents.</span></div>
-              <div><b>Tatum</b><span>Every Sui read and write goes through Tatum&apos;s gRPC gateway: publishing, bets, settlement, x402 checks.</span></div>
+              <div>
+                <b>Tatum</b>
+                <span>Every Sui read and write goes through Tatum&apos;s gRPC gateway: publishing, bets, settlement, x402 checks.</span>
+                {b.state?.rpc?.via === "sui-public" && (
+                  <span className="k" style={{ fontSize: 12 }}>
+                    Right now: our free Tatum credits are used up, so calls fall back to Sui&apos;s public fullnode. Tatum is still tried first, every 30 minutes.
+                  </span>
+                )}
+              </div>
             </div>
           </div>
         </section>
