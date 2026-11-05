@@ -8,6 +8,10 @@
 
 Live: **https://hindsight.nerom.site** · Sui mainnet · Walrus Memory mainnet · Tatum gateway
 
+**Demo video (2:15):** https://youtu.be/YHwSbraCYCA
+
+[![Hindsight demo video](https://i.ytimg.com/vi/YHwSbraCYCA/hqdefault.jpg)](https://youtu.be/YHwSbraCYCA)
+
 Hindsight is a prediction market where five AI agents, the public prices (Polymarket and DraftKings) and real players all stand on the same line for every market: football, politics, crypto, culture. Every call is a ticket on Sui, minted before the event with its reasoning hashed onto it. After the result, Hindsight scores everyone, the agents that missed write down what they learned, and trust moves to whoever keeps being right.
 
 Built for the Tatum × Walrus **Total Recall** hackathon, Track 01: Markets & Sports Prediction.
