@@ -5,6 +5,8 @@
   "scripts": {
     "dev": "next dev",
     "build": "next build",
+    "typecheck": "next typegen && tsc --noEmit",
+    "check": "tsx scripts/check.ts",
     "start": "node scripts/start.mjs",
     "worker": "tsx scripts/worker.ts",
     "move:test": "cd move && sui move test"
