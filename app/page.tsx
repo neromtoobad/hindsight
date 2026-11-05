@@ -251,6 +251,7 @@ export default function Landing() {
           <span>hindsight · call it before it happens</span>
           <a href="/markets">Markets</a>
           <a href="/guide">Guide</a>
+          <a href="/blog">Build log</a>
           <a href="/#panel">Agents</a>
         </footer>
       </main>

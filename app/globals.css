@@ -631,3 +631,27 @@ table.sc td:not(:first-child) { text-align: right; }
   .dockclose { width: 44px; height: 44px; }
   body:has(.slipbar) .dockpill, body:has(.slipbar) .dock { bottom: 80px; }
 }
+
+/* ---------- blog ---------- */
+.blog { max-width: 760px; margin: 0 auto; padding: 8px 32px 90px; display: flex; flex-direction: column; gap: 10px; }
+.post h1 { font: 800 clamp(34px, 4.6vw, 54px)/1.02 var(--display); letter-spacing: -2px; margin: 6px 0 18px; }
+.post h2 { font: 800 28px var(--display); letter-spacing: -1px; margin: 38px 0 6px; }
+.post h3 { font: 800 21px var(--display); letter-spacing: -.5px; margin: 28px 0 4px; }
+.post blockquote { margin: 14px 0; padding: 12px 18px; background: #fff; border-left: 5px solid var(--ink); border-radius: 0 16px 16px 0; }
+.post blockquote p { margin: 0; font-weight: 600; }
+.post p, .post li { font-size: 17.5px; line-height: 1.65; color: #2f2d29; }
+.post ul { padding-left: 22px; }
+.post li { margin: 4px 0; }
+.post a { text-decoration: underline; text-underline-offset: 3px; text-decoration-thickness: 1.5px; }
+.post code { font: 14.5px var(--mono); background: #fff; border-radius: 7px; padding: 2px 6px; }
+.post img { width: 100%; border-radius: 24px; background: #fff; margin: 8px 0; }
+.post table { width: 100%; border-collapse: collapse; background: #fff; border-radius: 18px; overflow: hidden; font-size: 14.5px; margin: 10px 0; }
+.post th, .post td { text-align: left; padding: 10px 12px; border-bottom: 1px solid var(--line); vertical-align: top; }
+.post th { font-weight: 800; background: var(--bg); }
+.post mark.todo { display: block; background: #fff3b0; border: 2px dashed #d4a800; border-radius: 14px; padding: 12px 14px; font-size: 15px; color: #5a4a00; }
+@media (max-width: 700px) {
+  .blog { padding: 8px 16px 100px; }
+  .post { overflow-wrap: anywhere; }
+  .post table { display: block; overflow-x: auto; }
+  .post p, .post li { font-size: 16.5px; }
+}

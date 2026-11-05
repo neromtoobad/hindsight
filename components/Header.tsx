@@ -56,6 +56,7 @@ export function Header({
         <a href="/markets">Markets</a>
         <a href="/#panel">Agents</a>
         <a href="/guide">Guide</a>
+        <a href="/blog">Build log</a>
       </nav>
       {setCat && (
         <nav className="chips mobile-only">
