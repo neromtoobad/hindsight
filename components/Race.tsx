@@ -13,7 +13,7 @@ export function Race({ rows, you }: { rows: Row[]; you?: string }) {
   const pos = (skill: number, n: number) => (n === 0 ? 6 : hi - lo < 1e-6 ? 50 : 14 + ((skill - lo) / (hi - lo)) * 66);
   return (
     <div className="panel">
-      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline" }}>
+      <div className="racehead">
         <span className="k">🏁 The race · all markets <Help to="scoring" /></span>
         <span className="k">{scored ? `${scored} calls scored · skill →` : "starts at the first result"}</span>
       </div>

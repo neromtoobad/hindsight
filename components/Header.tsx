@@ -23,7 +23,7 @@ function MeChip() {
   if (!me?.avatar)
     return (
       <button className="mechip make" onClick={openCharacter}>
-        <span className="plus">+</span> Make your character
+        <span className="plus">+</span> <span className="dsk">Make your </span>character
       </button>
     );
   return (

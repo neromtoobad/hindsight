@@ -65,6 +65,8 @@ function Track({ card, you, onYou, big, youLabel }: { card: Card; you?: You | nu
   const placed = lanes([...stands].sort((a, b) => b.probs[0] - a.probs[0]), (s) => (1 - s.probs[0]) * 100, big ? 7.5 : 6, big ? 3 : 2);
   const yesP = you ? (you.outcome === 0 ? you.conf : 1 - you.conf) : null;
   const laneH = big ? 46 : 24;
+  // big lines only reserve the rows they use; mini lines keep a fixed height so cards in a grid line up
+  const rows = big ? Math.max(2, ...placed.map((p) => p.lane + 1)) : 2;
   const crowd = card.crowd?.[0];
 
   const setFromX = (clientX: number) => {
@@ -76,7 +78,7 @@ function Track({ card, you, onYou, big, youLabel }: { card: Card; you?: You | nu
 
   return (
     <div className={`stage tline ${big ? "big" : "mini"} ${onYou ? "interactive" : ""}`}>
-      <div className="crowdzone" style={{ height: laneH * (big ? 3 : 2) + (big ? 14 : 4) }}>
+      <div className="crowdzone" style={{ height: laneH * rows + (big ? 14 : 4) }}>
         {placed.map(({ it, lane }) => (
           <span key={it.id} className="stand" style={{ left: `${(1 - it.probs[0]) * 100}%`, bottom: lane * laneH }}>
             <Marker s={it} size={sizeFor(it.w, big)} />

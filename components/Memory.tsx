@@ -10,7 +10,7 @@ const body = (t: string) => t.replace(/^\[[^\]]+\]\s*/, "");
 export function MemoryFeed({ items, stored }: { items: MemoryWrite[]; stored: number }) {
   return (
     <div className="panel">
-      <div style={{ display: "flex", justifyContent: "space-between" }}>
+      <div className="racehead">
         <span className="k">Walrus memory · live</span>
         <span className="k">{stored} stored on mainnet</span>
       </div>

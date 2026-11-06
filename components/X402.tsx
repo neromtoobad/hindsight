@@ -14,7 +14,7 @@ export function X402Panel({ feed }: { feed?: X402Feed }) {
   const [show, setShow] = useState(false);
   return (
     <div className="panel">
-      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline" }}>
+      <div className="racehead">
         <span className="k">x402 · agents paying agents <Help to="x402" /></span>
         <span className="k">{feed ? `${feed.calls} paid · ${sui(feed.totalMist)} SUI` : ""}</span>
       </div>

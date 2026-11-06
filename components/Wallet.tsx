@@ -22,7 +22,7 @@ export function WalletButton({ balance }: { balance?: string | null }) {
   return (
     <div className="wallet" style={{ position: "relative" }}>
       <button className="lip" onClick={() => setOpen((o) => !o)}>
-        Connect wallet
+        Connect<span className="dsk"> wallet</span>
       </button>
       {open && (
         <div className="panel" style={{ position: "absolute", right: 0, top: 52, zIndex: 20, width: 260, boxShadow: "0 20px 40px -10px #0004" }}>

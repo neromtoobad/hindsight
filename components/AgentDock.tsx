@@ -48,7 +48,7 @@ export function AgentDock({ marketKey, marketTitle }: { marketKey?: string; mark
               <img key={id} src={`/agents/${AGENTS[id].slug}-head.png`} alt="" style={{ background: AGENTS[id].tint }} />
             ))}
           </span>
-          Ask the agents
+          <span className="dlabel">Ask the agents</span>
         </button>
       )}
       <div className={`dock ${fan ? "" : "hidden"}`} aria-label="Chat with the agents">
