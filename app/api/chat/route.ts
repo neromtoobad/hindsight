@@ -1,5 +1,6 @@
 import { z } from "zod";
 import { chatStream } from "@/lib/chat";
+import { BudgetError } from "@/lib/budget";
 
 export const dynamic = "force-dynamic";
 
@@ -54,6 +55,7 @@ export async function POST(req: Request) {
     });
     return new Response(body, { headers: { "content-type": "text/plain; charset=utf-8", "x-lessons-recalled": String(lessons), "cache-control": "no-store" } });
   } catch (e) {
+    if (e instanceof BudgetError) return Response.json({ error: "The agents have talked their limit for today. Their calls and records are still on the board." }, { status: 429 });
     return Response.json({ error: (e as Error).message }, { status: 500 });
   }
 }

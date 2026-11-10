@@ -2,6 +2,7 @@
 // lessons it wrote to Walrus after past misses: the memory loop, made conversational.
 import Anthropic from "@anthropic-ai/sdk";
 import { env } from "./env";
+import { spend } from "./budget";
 import { load } from "./store";
 import { recall } from "./memory";
 import { PERSONAS, type Persona } from "./agents";
@@ -88,6 +89,7 @@ export async function chatStream(slug: string, marketKey: string | undefined, me
   if (!p) throw new Error("unknown agent");
   const lastUser = [...messages].reverse().find((m) => m.role === "user")?.content ?? "";
   const ctx = await context(p, marketKey, lastUser);
+  spend("chat");
   const stream = ai().messages.stream({
     model: env.agentModel,
     max_tokens: 1200,

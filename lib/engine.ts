@@ -4,13 +4,16 @@ import * as pm from "./sources/polymarket";
 import * as espn from "./sources/espn";
 import * as chain from "./sui";
 import { remember, recall, sha256 } from "./memory";
-import { PERSONAS, agentWallets, decide, lessonFrom, type Persona } from "./agents";
+import { PERSONAS, agentWallets, decide, lessonFrom, type AgentPick, type Persona } from "./agents";
+import { BudgetError, callsLeft, coolOff, coolingDown } from "./budget";
 import { brier, line, record, skill, snapshot } from "./credibility";
 import type { Db, MarketRec, PickRec } from "./types";
 
 const MAX_OPEN = Number(process.env.MAX_OPEN_MARKETS ?? 24);
 /** Agents call a market only inside this window before close, so they see fresh information. */
 const AGENT_WINDOW_MS = Number(process.env.AGENT_WINDOW_HOURS ?? 36) * 3600_000;
+/** How long an agent waits before re-deciding a market whose pick was decided but not recorded. */
+const RETRY_MS = Number(process.env.AGENT_RETRY_HOURS ?? 6) * 3600_000;
 const pct = (x: number) => `${Math.round(x * 100)}%`;
 const iso = (t: number) => new Date(t).toISOString().slice(0, 16) + "Z";
 
@@ -157,18 +160,40 @@ export async function agentRound(maxPicks = Number(process.env.AGENT_PICKS_PER_R
     if (bal < need) broke.add(p.slug);
   }
   if (broke.size) log(`agents without gas: ${[...broke].join(", ")}`);
+  if (broke.size === PERSONAS.length) return done;
+  if (!callsLeft("worker")) {
+    log("agents: daily model budget reached, no more picks until 00:00 UTC");
+    return done;
+  }
 
   for (const m of due) {
     for (const p of PERSONAS) {
       if (done >= maxPicks) return done;
       if (broke.has(p.slug)) continue;
+      if (coolingDown(`agent:${p.slug}`) || coolingDown(`${p.slug}|${m.key}`)) continue;
       const id = agentId(p);
       if (load().picks.some((x) => x.marketKey === m.key && x.forecaster === id)) continue;
       try {
         await agentPick(p, m, wallets[p.slug].secret, now);
         done++;
       } catch (e) {
-        log(`${p.slug} on ${m.key}: ${(e as Error).message}`);
+        const msg = (e as Error).message;
+        if (e instanceof BudgetError) {
+          log(`agents: ${msg}`);
+          return done;
+        }
+        // A rejected model key fails every call the same way: stop the round instead of hammering it.
+        if ([401, 403].includes((e as { status?: number }).status ?? 0)) {
+          log(`agents: the model key was rejected (${msg.slice(0, 120)})`);
+          return done;
+        }
+        // A failed pick sits this agent out for the rest of the round. If the model call was already
+        // paid for, the same market is not asked again for hours: retrying every tick is what drained
+        // the model credit in week one. A wallet that cannot cover gas also rests for an hour.
+        broke.add(p.slug);
+        if ((e as { paid?: boolean }).paid) coolOff(`${p.slug}|${m.key}`, RETRY_MS);
+        if (/insufficient|gas|balance/i.test(msg)) coolOff(`agent:${p.slug}`, 3600_000);
+        log(`${p.slug} on ${m.key}: ${msg}`);
       }
     }
   }
@@ -176,7 +201,6 @@ export async function agentRound(maxPicks = Number(process.env.AGENT_PICKS_PER_R
 }
 
 async function agentPick(p: Persona, m: MarketRec, secret: string, now: number) {
-  const id = agentId(p);
   const scope = `${m.category}/${m.league}`;
   // The learning loop: recall this agent's own lessons and scorecards from Walrus before deciding.
   const [lessons, history] = await Promise.all([
@@ -190,6 +214,16 @@ async function agentPick(p: Persona, m: MarketRec, secret: string, now: number) 
     trust,
     now,
   });
+  // From here on the model call is paid for: tag any failure so the round does not repeat it.
+  try {
+    await placeAndRecord(p, m, secret, now, out);
+  } catch (e) {
+    throw Object.assign(e as Error, { paid: true });
+  }
+}
+
+async function placeAndRecord(p: Persona, m: MarketRec, secret: string, now: number, out: AgentPick) {
+  const id = agentId(p);
   const note = `[${iso(now)}] ${p.name} on "${m.question}" (${m.key}): backs ${m.outcomes[out.pick]}. ${m.outcomes
     .map((o, i) => `${o} ${pct(out.probs[i])}`)
     .join(", ")}. ${out.reasoning}${out.lessons_applied.length ? ` Lessons applied: ${out.lessons_applied.join(" | ")}` : ""}`;

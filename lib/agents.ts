@@ -5,6 +5,7 @@ import { zodOutputFormat } from "@anthropic-ai/sdk/helpers/zod";
 import { z } from "zod";
 import { Ed25519Keypair } from "@mysten/sui/keypairs/ed25519";
 import { env } from "./env";
+import { metered } from "./budget";
 import type { MarketRec, PickRec } from "./types";
 
 export interface Persona {
@@ -127,13 +128,21 @@ ${ctx.history.length ? ctx.history.map((h) => `- ${h}`).join("\n") : "- (none ye
 
 Give your probabilities, the outcome you back, and why. If a notebook lesson fits this market, apply it and list it.`;
 
-  const res = await ai().messages.parse({
-    model: env.agentModel,
-    max_tokens: 4000,
-    output_config: { effort: p.webSearch ? "medium" : "low", format: zodOutputFormat(PickOut) },
-    system: `You are ${p.name}, a forecaster in Hindsight, a prediction market where every call is logged before the event and scored after. ${p.style} You are scored by Brier score, so calibrated probabilities beat bold ones.`,
-    ...(p.webSearch ? { tools: [{ type: "web_search_20260209" as const, name: "web_search" as const, max_uses: 2 }] } : {}),
-    messages: [{ role: "user", content: prompt }],
+  const call = (search: boolean) =>
+    metered("worker", () =>
+      ai().messages.parse({
+        model: env.agentModel,
+        max_tokens: 4000,
+        output_config: { effort: search ? "medium" : "low", format: zodOutputFormat(PickOut) },
+        system: `You are ${p.name}, a forecaster in Hindsight, a prediction market where every call is logged before the event and scored after. ${p.style} You are scored by Brier score, so calibrated probabilities beat bold ones.`,
+        ...(search ? { tools: [{ type: "web_search_20260209" as const, name: "web_search" as const, max_uses: 2 }] } : {}),
+        messages: [{ role: "user", content: prompt }],
+      }),
+    );
+  const res = await call(Boolean(p.webSearch)).catch((e) => {
+    // If the configured model rejects the search tool, still make the call from the reference prices.
+    if (p.webSearch && e instanceof Anthropic.BadRequestError) return call(false);
+    throw e;
   });
   const out = res.parsed_output;
   if (!out) throw new Error(`${p.slug}: no parsed output (stop ${res.stop_reason})`);
@@ -150,40 +159,44 @@ function normalise(o: AgentPick, k: number): AgentPick {
 }
 
 export async function lessonFrom(p: Persona, m: MarketRec, pick: PickRec): Promise<string> {
-  const res = await ai().messages.parse({
-    model: env.agentModel,
-    max_tokens: 2000,
-    output_config: { effort: "low", format: zodOutputFormat(LessonOut) },
-    system: `You are ${p.name}, reviewing a forecast you got wrong. ${p.style}`,
-    messages: [
-      {
-        role: "user",
-        content: `Market: ${m.question} (${m.category}/${m.league})
+  const res = await metered("worker", () =>
+    ai().messages.parse({
+      model: env.agentModel,
+      max_tokens: 2000,
+      output_config: { effort: "low", format: zodOutputFormat(LessonOut) },
+      system: `You are ${p.name}, reviewing a forecast you got wrong. ${p.style}`,
+      messages: [
+        {
+          role: "user",
+          content: `Market: ${m.question} (${m.category}/${m.league})
 You said: ${m.outcomes.map((o, i) => `${o} ${pct(pick.probs[i])}`).join(", ")}
 Your reasoning then: ${pick.reasoning}
 Actual result: ${m.outcomes[m.winner!]}
 ${pick.refAtPick ? "Reference prices when you made the call" : "Reference prices at close (the prices you saw weren't recorded, and the line may have moved after your call)"}: ${Object.entries(pick.refAtPick ?? m.ref).map(([s, pr]) => `${s} ${m.outcomes.map((o, i) => `${o} ${pct(pr[i])}`).join(", ")}`).join(" | ") || "none"}
 
 Write the one lesson you will apply next time.`,
-      },
-    ],
-  });
+        },
+      ],
+    }),
+  );
   return res.parsed_output?.lesson ?? "";
 }
 
 export async function answer(question: string, memories: string[], table: string): Promise<string> {
-  const res = await ai().messages.create({
-    model: env.agentModel,
-    max_tokens: 2000,
-    output_config: { effort: "low" },
-    system:
-      "You are Hindsight, a prediction market that remembers every call. Answer from the memories and the credibility table only. Name forecasters and numbers. Three sentences at most. Never tell the reader to bet or which side to take.",
-    messages: [
-      {
-        role: "user",
-        content: `Question: ${question}\n\nCredibility table:\n${table}\n\nMemories from Walrus:\n${memories.map((m) => `- ${m}`).join("\n") || "- none"}`,
-      },
-    ],
-  });
+  const res = await metered("chat", () =>
+    ai().messages.create({
+      model: env.agentModel,
+      max_tokens: 2000,
+      output_config: { effort: "low" },
+      system:
+        "You are Hindsight, a prediction market that remembers every call. Answer from the memories and the credibility table only. Name forecasters and numbers. Three sentences at most. Never tell the reader to bet or which side to take.",
+      messages: [
+        {
+          role: "user",
+          content: `Question: ${question}\n\nCredibility table:\n${table}\n\nMemories from Walrus:\n${memories.map((m) => `- ${m}`).join("\n") || "- none"}`,
+        },
+      ],
+    }),
+  );
   return res.content.flatMap((b) => (b.type === "text" ? [b.text] : [])).join("\n");
 }
