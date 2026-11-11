@@ -1,5 +1,5 @@
 <!--
-"The first three days" is a snapshot from Oct 31; "One week in" is from Nov 5 (api/state + /api/forecasters/<id>).
+"The first three days" is a snapshot from Oct 31; "One week in" is from Nov 7 (api/state + /api/forecasters/<id>).
 -->
 
 # Hindsight: a prediction market that remembers who was right
@@ -44,7 +44,7 @@ Walrus Memory is where Hindsight keeps everything that has to outlive a single m
 
 The read side matters more than the write side. Before an agent calls a market, Hindsight recalls the five lessons from its notebook most relevant to that market and its four most recent scorecards, and puts them in front of the model along with the prices. The agent doesn't start fresh every time. It starts from what it learned the last time it was wrong about something similar.
 
-By October 31 Hindsight had written 361 memories to Walrus mainnet, up from 50 on day one. By November 5 it was past 1,900.
+By October 31 Hindsight had written 361 memories to Walrus mainnet, up from 50 on day one. By November 7 it was past 2,300.
 
 ## How it uses Tatum
 
@@ -125,27 +125,27 @@ Hindsight still scores those calls against the real result, so the lessons still
 
 ### One week in
 
-By November 5 Hindsight had opened 187 markets and settled 100 of them, with 578 calls on chain and 6.05 SUI staked. The table now:
+By November 7 Hindsight had opened 212 markets and settled 121 of them, with 674 calls on chain and 7.1 SUI staked. The table now:
 
 | Forecaster | Scored calls | Picked the winner | Skill |
 |---|---|---|---|
-| Polymarket | 119 | 72% | 0.34 |
-| Form Guide | 91 | 71% | 0.30 |
-| The Quant | 94 | 68% | 0.29 |
-| The Contrarian | 82 | 61% | 0.29 |
-| The Skeptic | 121 | 69% | 0.24 |
-| Newsroom | 94 | 67% | 0.23 |
-| DraftKings | 28 | 61% | 0.15 |
+| Polymarket | 139 | 73% | 0.334 |
+| Form Guide | 113 | 76% | 0.332 |
+| The Quant | 116 | 73% | 0.331 |
+| The Contrarian | 104 | 64% | 0.330 |
+| Newsroom | 115 | 72% | 0.267 |
+| The Skeptic | 142 | 70% | 0.252 |
+| DraftKings | 31 | 65% | 0.162 |
 
-Polymarket took the lead, which is what you'd expect from a liquid market. With more results, the overall table matters less than the split by category, because that's where trust is actually decided:
+Polymarket still leads, which is what you'd expect from a liquid market, but only just: the top four are within 0.004 of each other. With more results, the overall table matters less than the split by category, because that's where trust is actually decided:
 
-- **Crypto.** Four of the five agents beat Polymarket (0.71 to 0.77 against 0.64; the Skeptic is level at 0.63). On Bitcoin markets the Contrarian is 11 for 11 with a skill of 0.89, the Quant 0.83, Form Guide and the Skeptic 0.79, and Polymarket 0.60.
-- **Politics.** Polymarket is clearly better: 0.54 against 0.37 to 0.42 for the agents.
-- **Sports.** Nobody is beating a coin flip yet. The agents sit between −0.07 and −0.01 and Polymarket at 0.05.
+- **Crypto.** Four of the five agents beat Polymarket (0.73 to 0.78 against 0.67; the Skeptic is just behind at 0.66). On Bitcoin markets all five beat it: Newsroom is 8 for 8 with a skill of 0.97, the Contrarian 13 for 13 at 0.90, the Quant 0.84, the Skeptic 0.82, Form Guide 0.81, and Polymarket 0.64.
+- **Politics.** Polymarket is clearly better: 0.53 against 0.39 to 0.48 for the agents.
+- **Sports.** Everyone is only just better than a coin flip. The agents sit between 0.03 and 0.08 and Polymarket at 0.09.
 
 That's why credibility is per scope. On the next Bitcoin market, the trust line leans on the panel; on the next Senate race, it leans on Polymarket. A single global ranking would get one of those wrong.
 
-Last week I said the Contrarian's new lessons, back the underdog outright, could turn out to be an overreaction. In football they have, so far: it picked the winner in 6 of 20 football calls, the worst of the panel, though its skill there is still slightly positive because it wasn't very sure of those picks. Upsets also still pay nobody. Of the last 30 settled markets, 13 were voided because nobody backed the winner. The disagreement flag fired again on an Ethereum market on November 5, and the market was right again. It's still a flag worth reading, not a signal worth betting on.
+Last week I said the Contrarian's new lessons, back the underdog outright, could turn out to be an overreaction. In football they have, so far: it picked the winner in 7 of 23 football calls, the worst of the panel, though its skill there is still slightly positive (0.11) because it wasn't very sure of those picks. Upsets also still pay nobody. Of the last 30 settled markets, 7 were voided: 6 because nobody backed the winner, and one tennis match that closed without a winner. The disagreement flag fired on an Ethereum market on November 5, and the market was right. On November 6 it fired on an Elon Musk tweet-count market: Polymarket had Yes at 75%, the trust line had it at 55%, and the answer was No. The trust line still leaned the wrong way, just less far. It's still a flag worth reading, not a signal worth betting on.
 
 ## What's next
 
